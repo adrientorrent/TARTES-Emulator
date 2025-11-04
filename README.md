@@ -4,7 +4,7 @@
 
 ## Le modèle TARTES
 
-*TODO*
+Le modèle TARTES (Two-streAm Radiative TransfEr in Snow) calcule l'albédo spectral et les profils d'absorption spectrale d'un manteau neigeux. Chaque couche de neige est caractérisée par sa surface spécifique, sa densité et sa teneur en impuretés... *TODO*
 
 ## Description du modèle
 
