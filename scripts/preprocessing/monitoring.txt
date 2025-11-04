@@ -1,0 +1,333 @@
+----- GEO : Alpes -----
+2025-11-03 17:23:30
+YEAR : 1985-1986
+[10] Temps d'exécution : 154.93 secondes
+[9] Temps d'exécution : 164.10 secondes
+[8] Temps d'exécution : 278.66 secondes
+[7] Temps d'exécution : 297.19 secondes
+[6] Temps d'exécution : 628.92 secondes
+[12] Temps d'exécution : 737.49 secondes
+[11] Temps d'exécution : 746.94 secondes
+[5] Temps d'exécution : 1032.17 secondes
+[1] Temps d'exécution : 1123.32 secondes
+[2] Temps d'exécution : 1171.76 secondes
+[4] Temps d'exécution : 1217.93 secondes
+[3] Temps d'exécution : 1338.29 secondes
+(1/11) Année 1985-1986 traitée
+2025-11-03 17:53:30
+YEAR : 1982-1983
+[9] Temps d'exécution : 227.29 secondes
+[8] Temps d'exécution : 229.67 secondes
+[7] Temps d'exécution : 464.55 secondes
+[10] Temps d'exécution : 655.46 secondes
+[11] Temps d'exécution : 771.14 secondes
+[6] Temps d'exécution : 813.80 secondes
+[12] Temps d'exécution : 995.41 secondes
+[1] Temps d'exécution : 1045.34 secondes
+[5] Temps d'exécution : 1112.17 secondes
+[2] Temps d'exécution : 1175.51 secondes
+[4] Temps d'exécution : 1200.71 secondes
+[3] Temps d'exécution : 1282.64 secondes
+(2/11) Année 1982-1983 traitée
+2025-11-03 18:23:30
+YEAR : 1979-1980
+[9] Temps d'exécution : 332.50 secondes
+[8] Temps d'exécution : 381.27 secondes
+[10] Temps d'exécution : 506.73 secondes
+[7] Temps d'exécution : 700.96 secondes
+[11] Temps d'exécution : 861.33 secondes
+[6] Temps d'exécution : 906.53 secondes
+[12] Temps d'exécution : 1033.50 secondes
+[2] Temps d'exécution : 1141.78 secondes
+[5] Temps d'exécution : 1188.43 secondes
+[1] Temps d'exécution : 1204.47 secondes
+[4] Temps d'exécution : 1256.56 secondes
+[3] Temps d'exécution : 1305.26 secondes
+(3/11) Année 1979-1980 traitée
+2025-11-03 18:53:30
+YEAR : 1987-1988
+[9] Temps d'exécution : 208.08 secondes
+[8] Temps d'exécution : 291.85 secondes
+[7] Temps d'exécution : 484.65 secondes
+[10] Temps d'exécution : 539.92 secondes
+[6] Temps d'exécution : 718.68 secondes
+[11] Temps d'exécution : 720.56 secondes
+[12] Temps d'exécution : 854.91 secondes
+[1] Temps d'exécution : 976.37 secondes
+[5] Temps d'exécution : 992.19 secondes
+[2] Temps d'exécution : 1114.88 secondes
+[4] Temps d'exécution : 1152.07 secondes
+[3] Temps d'exécution : 1286.62 secondes
+(4/11) Année 1987-1988 traitée
+2025-11-03 19:23:30
+YEAR : 1984-1985
+[8] Temps d'exécution : 289.17 secondes
+[7] Temps d'exécution : 513.78 secondes
+[9] Temps d'exécution : 551.80 secondes
+[10] Temps d'exécution : 715.91 secondes
+[11] Temps d'exécution : 742.44 secondes
+[6] Temps d'exécution : 813.60 secondes
+[12] Temps d'exécution : 997.19 secondes
+[2] Temps d'exécution : 1144.82 secondes
+[5] Temps d'exécution : 1167.16 secondes
+[1] Temps d'exécution : 1222.76 secondes
+[4] Temps d'exécution : 1228.16 secondes
+[3] Temps d'exécution : 1367.39 secondes
+(5/11) Année 1984-1985 traitée
+2025-11-03 19:53:30
+YEAR : 1981-1982
+[8] Temps d'exécution : 192.30 secondes
+[9] Temps d'exécution : 274.01 secondes
+[7] Temps d'exécution : 374.22 secondes
+[11] Temps d'exécution : 576.81 secondes
+[10] Temps d'exécution : 623.25 secondes
+[6] Temps d'exécution : 698.09 secondes
+[5] Temps d'exécution : 1071.41 secondes
+[2] Temps d'exécution : 1078.16 secondes
+[1] Temps d'exécution : 1123.99 secondes
+[12] Temps d'exécution : 1149.98 secondes
+[4] Temps d'exécution : 1185.68 secondes
+[3] Temps d'exécution : 1258.58 secondes
+(6/11) Année 1981-1982 traitée
+2025-11-03 20:23:30
+YEAR : 1983-1984
+[8] Temps d'exécution : 160.33 secondes
+[9] Temps d'exécution : 239.62 secondes
+[10] Temps d'exécution : 353.57 secondes
+[7] Temps d'exécution : 402.71 secondes
+[11] Temps d'exécution : 453.36 secondes
+[6] Temps d'exécution : 870.96 secondes
+[12] Temps d'exécution : 939.48 secondes
+[1] Temps d'exécution : 952.46 secondes
+[5] Temps d'exécution : 1016.90 secondes
+[2] Temps d'exécution : 1167.87 secondes
+[4] Temps d'exécution : 1232.90 secondes
+[3] Temps d'exécution : 1317.59 secondes
+(7/11) Année 1983-1984 traitée
+2025-11-03 20:53:30
+YEAR : 1980-1981
+[9] Temps d'exécution : 137.83 secondes
+[8] Temps d'exécution : 238.49 secondes
+[7] Temps d'exécution : 394.14 secondes
+[6] Temps d'exécution : 589.01 secondes
+[10] Temps d'exécution : 620.24 secondes
+[11] Temps d'exécution : 761.64 secondes
+[5] Temps d'exécution : 900.74 secondes
+[4] Temps d'exécution : 926.34 secondes
+[12] Temps d'exécution : 1025.49 secondes
+[1] Temps d'exécution : 1051.06 secondes
+[2] Temps d'exécution : 1071.69 secondes
+[3] Temps d'exécution : 1178.27 secondes
+(8/11) Année 1980-1981 traitée
+2025-11-03 21:23:30
+YEAR : 1988-1989
+[8] Temps d'exécution : 174.38 secondes
+[9] Temps d'exécution : 234.93 secondes
+[7] Temps d'exécution : 262.45 secondes
+[10] Temps d'exécution : 407.00 secondes
+[6] Temps d'exécution : 483.10 secondes
+[11] Temps d'exécution : 542.59 secondes
+[5] Temps d'exécution : 769.39 secondes
+[1] Temps d'exécution : 801.39 secondes
+[2] Temps d'exécution : 837.95 secondes
+[12] Temps d'exécution : 869.82 secondes
+[4] Temps d'exécution : 1046.79 secondes
+[3] Temps d'exécution : 1049.34 secondes
+(9/11) Année 1988-1989 traitée
+2025-11-03 21:53:30
+YEAR : 1989-1990
+[8] Temps d'exécution : 136.84 secondes
+[9] Temps d'exécution : 161.20 secondes
+[7] Temps d'exécution : 285.14 secondes
+[10] Temps d'exécution : 312.21 secondes
+[6] Temps d'exécution : 479.69 secondes
+[11] Temps d'exécution : 529.92 secondes
+[12] Temps d'exécution : 581.37 secondes
+[1] Temps d'exécution : 669.83 secondes
+[5] Temps d'exécution : 719.56 secondes
+[2] Temps d'exécution : 819.02 secondes
+[3] Temps d'exécution : 912.63 secondes
+[4] Temps d'exécution : 920.84 secondes
+(10/11) Année 1989-1990 traitée
+2025-11-03 22:23:30
+YEAR : 1986-1987
+[9] Temps d'exécution : 172.04 secondes
+[8] Temps d'exécution : 195.14 secondes
+[10] Temps d'exécution : 357.82 secondes
+[7] Temps d'exécution : 415.43 secondes
+[11] Temps d'exécution : 602.42 secondes
+[6] Temps d'exécution : 665.01 secondes
+[12] Temps d'exécution : 849.08 secondes
+[5] Temps d'exécution : 910.06 secondes
+[2] Temps d'exécution : 962.90 secondes
+[4] Temps d'exécution : 1025.76 secondes
+[1] Temps d'exécution : 1032.59 secondes
+[3] Temps d'exécution : 1096.59 secondes
+(11/11) Année 1986-1987 traitée
+----- GEO : Pyrenees -----
+2025-11-03 22:53:30
+YEAR : 1985-1986
+[9] Temps d'exécution : 34.03 secondes
+[8] Temps d'exécution : 66.69 secondes
+[7] Temps d'exécution : 93.23 secondes
+[10] Temps d'exécution : 97.58 secondes
+[6] Temps d'exécution : 290.51 secondes
+[11] Temps d'exécution : 373.83 secondes
+[12] Temps d'exécution : 471.95 secondes
+[5] Temps d'exécution : 627.56 secondes
+[3] Temps d'exécution : 735.50 secondes
+[1] Temps d'exécution : 737.17 secondes
+[2] Temps d'exécution : 797.31 secondes
+[4] Temps d'exécution : 819.26 secondes
+(1/11) Année 1985-1986 traitée
+2025-11-03 23:23:30
+YEAR : 1982-1983
+[8] Temps d'exécution : 66.29 secondes
+[9] Temps d'exécution : 76.54 secondes
+[7] Temps d'exécution : 203.01 secondes
+[10] Temps d'exécution : 335.19 secondes
+[6] Temps d'exécution : 404.93 secondes
+[11] Temps d'exécution : 465.96 secondes
+[5] Temps d'exécution : 617.09 secondes
+[1] Temps d'exécution : 621.10 secondes
+[12] Temps d'exécution : 644.04 secondes
+[3] Temps d'exécution : 688.26 secondes
+[4] Temps d'exécution : 712.05 secondes
+[2] Temps d'exécution : 736.15 secondes
+(2/11) Année 1982-1983 traitée
+2025-11-03 23:53:30
+YEAR : 1979-1980
+[8] Temps d'exécution : 122.47 secondes
+[9] Temps d'exécution : 138.19 secondes
+[7] Temps d'exécution : 288.75 secondes
+[10] Temps d'exécution : 351.74 secondes
+[6] Temps d'exécution : 495.99 secondes
+[11] Temps d'exécution : 564.73 secondes
+[12] Temps d'exécution : 585.32 secondes
+[2] Temps d'exécution : 586.93 secondes
+[5] Temps d'exécution : 654.08 secondes
+[4] Temps d'exécution : 727.62 secondes
+[1] Temps d'exécution : 799.38 secondes
+[3] Temps d'exécution : 847.19 secondes
+(3/11) Année 1979-1980 traitée
+2025-11-04 00:23:30
+YEAR : 1987-1988
+[9] Temps d'exécution : 43.74 secondes
+[8] Temps d'exécution : 69.59 secondes
+[7] Temps d'exécution : 267.57 secondes
+[10] Temps d'exécution : 273.60 secondes
+[11] Temps d'exécution : 419.82 secondes
+[6] Temps d'exécution : 441.90 secondes
+[12] Temps d'exécution : 484.28 secondes
+[5] Temps d'exécution : 582.51 secondes
+[1] Temps d'exécution : 618.49 secondes
+[4] Temps d'exécution : 699.89 secondes
+[2] Temps d'exécution : 723.76 secondes
+[3] Temps d'exécution : 805.13 secondes
+(4/11) Année 1987-1988 traitée
+2025-11-04 00:53:30
+YEAR : 1984-1985
+[8] Temps d'exécution : 123.41 secondes
+[7] Temps d'exécution : 175.58 secondes
+[9] Temps d'exécution : 213.12 secondes
+[10] Temps d'exécution : 375.96 secondes
+[6] Temps d'exécution : 410.93 secondes
+[11] Temps d'exécution : 477.29 secondes
+[2] Temps d'exécution : 599.17 secondes
+[12] Temps d'exécution : 614.82 secondes
+[5] Temps d'exécution : 680.84 secondes
+[4] Temps d'exécution : 701.16 secondes
+[1] Temps d'exécution : 795.94 secondes
+[3] Temps d'exécution : 837.92 secondes
+(5/11) Année 1984-1985 traitée
+2025-11-04 01:23:30
+YEAR : 1981-1982
+[8] Temps d'exécution : 95.45 secondes
+[9] Temps d'exécution : 116.90 secondes
+[7] Temps d'exécution : 142.97 secondes
+[10] Temps d'exécution : 255.81 secondes
+[11] Temps d'exécution : 258.51 secondes
+[6] Temps d'exécution : 358.17 secondes
+[12] Temps d'exécution : 608.13 secondes
+[5] Temps d'exécution : 651.23 secondes
+[1] Temps d'exécution : 660.05 secondes
+[4] Temps d'exécution : 674.32 secondes
+[2] Temps d'exécution : 683.53 secondes
+[3] Temps d'exécution : 800.32 secondes
+(6/11) Année 1981-1982 traitée
+2025-11-04 01:53:30
+YEAR : 1983-1984
+[9] Temps d'exécution : 69.60 secondes
+[8] Temps d'exécution : 90.55 secondes
+[10] Temps d'exécution : 175.76 secondes
+[7] Temps d'exécution : 212.95 secondes
+[11] Temps d'exécution : 304.20 secondes
+[12] Temps d'exécution : 537.38 secondes
+[6] Temps d'exécution : 559.26 secondes
+[4] Temps d'exécution : 687.67 secondes
+[1] Temps d'exécution : 698.56 secondes
+[2] Temps d'exécution : 717.86 secondes
+[5] Temps d'exécution : 744.07 secondes
+[3] Temps d'exécution : 851.79 secondes
+(7/11) Année 1983-1984 traitée
+2025-11-04 02:23:30
+YEAR : 1980-1981
+[9] Temps d'exécution : 67.84 secondes
+[8] Temps d'exécution : 85.22 secondes
+[7] Temps d'exécution : 281.01 secondes
+[6] Temps d'exécution : 461.31 secondes
+[10] Temps d'exécution : 474.22 secondes
+[11] Temps d'exécution : 516.45 secondes
+[4] Temps d'exécution : 726.80 secondes
+[5] Temps d'exécution : 729.41 secondes
+[2] Temps d'exécution : 777.63 secondes
+[1] Temps d'exécution : 801.17 secondes
+[3] Temps d'exécution : 801.63 secondes
+[12] Temps d'exécution : 809.73 secondes
+(8/11) Année 1980-1981 traitée
+2025-11-04 02:53:31
+YEAR : 1988-1989
+[8] Temps d'exécution : 80.86 secondes
+[7] Temps d'exécution : 81.84 secondes
+[9] Temps d'exécution : 128.48 secondes
+[10] Temps d'exécution : 164.82 secondes
+[11] Temps d'exécution : 213.19 secondes
+[6] Temps d'exécution : 307.41 secondes
+[5] Temps d'exécution : 485.70 secondes
+[12] Temps d'exécution : 545.23 secondes
+[1] Temps d'exécution : 575.06 secondes
+[2] Temps d'exécution : 598.18 secondes
+[3] Temps d'exécution : 679.18 secondes
+[4] Temps d'exécution : 743.48 secondes
+(9/11) Année 1988-1989 traitée
+2025-11-04 03:23:31
+YEAR : 1989-1990
+[8] Temps d'exécution : 56.49 secondes
+[9] Temps d'exécution : 75.86 secondes
+[7] Temps d'exécution : 125.78 secondes
+[10] Temps d'exécution : 126.73 secondes
+[6] Temps d'exécution : 259.47 secondes
+[11] Temps d'exécution : 350.82 secondes
+[12] Temps d'exécution : 374.97 secondes
+[5] Temps d'exécution : 454.01 secondes
+[2] Temps d'exécution : 486.93 secondes
+[3] Temps d'exécution : 515.99 secondes
+[1] Temps d'exécution : 526.52 secondes
+[4] Temps d'exécution : 643.87 secondes
+(10/11) Année 1989-1990 traitée
+2025-11-04 03:53:31
+YEAR : 1986-1987
+[8] Temps d'exécution : 53.46 secondes
+[9] Temps d'exécution : 68.32 secondes
+[10] Temps d'exécution : 118.82 secondes
+[7] Temps d'exécution : 151.67 secondes
+[11] Temps d'exécution : 277.88 secondes
+[6] Temps d'exécution : 320.25 secondes
+[5] Temps d'exécution : 498.69 secondes
+[12] Temps d'exécution : 532.26 secondes
+[3] Temps d'exécution : 596.42 secondes
+[4] Temps d'exécution : 642.13 secondes
+[2] Temps d'exécution : 642.44 secondes
+[1] Temps d'exécution : 776.34 secondes
+(11/11) Année 1986-1987 traitée
+Preprocessing terminé.
