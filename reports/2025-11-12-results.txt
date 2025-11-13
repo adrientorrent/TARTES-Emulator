@@ -1,0 +1,33 @@
+Modèle utilisé :
+
+    Seulement 12k paramètres entrainables
+    Input : Nombre de couches fixé à 50, et ajout d'une composante booléenne indiquant la présence de neige
+    Output : albedo broadband
+    Convolutions : 2 couches + 1 couche de pooling
+    Couches denses : 2 couches (avec dropout)
+
+
+Données utilisées :
+
+    Entrainement sur 1 seule année (environ 7M de samples)
+    1 epoch (1 seul passage sur les données)
+    Evaluation du modèle sur une année différente
+
+
+Performances :
+
+    Batch size : 64 (choisie à l'instinct)
+    Nombre de batch traités par secondes : entre 40 et 55 -> environ 3000 samples par secondes
+    Temps total pour l'entraînement sur 1 GPU : 43 min
+    Temps d'évaluation du modèle : 37 min sur le dataset train + 27 min sur le dataset test
+    GPU util : 3% (catastrophique)
+=> conclusion : possibilité d'optimiser
+
+Résultats :
+
+    MSE à la fin de l'entrainement : 0.0024 (0.003 très vite atteint) => RMSE=0.0489
+    MSE évaluée sur les données d'entrainement : 0.0028 => RMSE=0.0529
+    MSE évaluée sur les données de test : 0.0028 => RMSE=0.0529 (pareil -> pas de surapprentissage, c'était attendu sur 1 seule année)
+
+=> conclusion : c'est prometteur
+

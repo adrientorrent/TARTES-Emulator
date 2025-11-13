@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 from time import sleep, gmtime, strftime
 from genericpath import exists
@@ -21,7 +23,7 @@ for geo in geos:
     # monitoring progression
     k = 0
     n_year = len(os.listdir(forcing_dir))
-    
+
     # --- FOR EACH YEAR ---
     for forcing in os.listdir(forcing_dir):
 
@@ -44,18 +46,19 @@ for geo in geos:
         if exists(output_dir):
             print(f"({k}/{n_year}) Année {year} déjà traitée")
         else:
-            # create directory 
+            # create directory
             os.mkdir(output_dir)
             # processing each month independently
             for month in range(1, 13):
-                
+
                 # set path of the output parquet file
                 output_file = output_dir+"/"+geo[0]+year+"-"+str(month)+".parquet"
-                
+
                 # run script (it will finish in 20 minutes)
-                command = f"python3 {script} -f {forcing_path} -p {pro_path} -m {month} -o {output_file} &"
+                options = f"-f {forcing_path} -p {pro_path} -m {month} -o {output_file}"
+                command = f"python3 {script} {options} &"
                 os.system(command)
-                
+
             # wait 30 minutes
             sleep(1800)
             print(f"({k}/{n_year}) Année {year} traitée")

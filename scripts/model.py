@@ -1,17 +1,20 @@
+#!/usr/bin/env python3
+
 import torch
 import torch.nn as nn
 
-# Première architecture simple pour les premiers essais
 
 class TartesEmulator(nn.Module):
+    # Première architecture simple pour les premiers essais
 
     def __init__(self):
-        
         super().__init__()
 
         # conv layers
-        self.conv1 = nn.Conv2d(in_channels=5, out_channels=64, kernel_size=5, padding=1)
-        self.conv2 = nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels=6, out_channels=64,
+                               kernel_size=(5, 1), padding=1)
+        self.conv2 = nn.Conv2d(in_channels=64, out_channels=32,
+                               kernel_size=(3, 1), padding=1)
         self.global_max_pool = nn.AdaptiveMaxPool2d((1, 1))
         self.flatten = nn.Flatten()
 

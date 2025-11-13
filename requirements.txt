@@ -11,3 +11,4 @@ netcdf4==1.7.2
 fastparquet==2024.11.0
 dask-core==2025.10.0
 scikit-learn==1.7.2
+flake8==7.3.0

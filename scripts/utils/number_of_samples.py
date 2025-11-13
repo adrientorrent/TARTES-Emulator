@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 import pandas as pd
 from utils.get_parquet_files import get_parquet_paths
@@ -22,4 +24,4 @@ for file in all_files:
 print(f"Number of samples: {samples}")
 
 t1 = time.time()
-print("Elapsed time: %.2f " %(t1 - t0) + "s")
+print(f"Elapsed time: {(t1 - t0):.2f} s")

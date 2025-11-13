@@ -1,0 +1,10 @@
+* Normalisation :
+	1. Normaliser le DF à l'ouverture et non à chaque lecture ?
+	2. Calculer la moyenne et l'écart-type uniquement sur les données d'entrainement
+	3. Sur le choix aléatoire des données : imposer une seed pour les réglages du modèle
+	4. Ajouter des métadonnées
+
+* Preprocessing :
+	1. Utiliser le packet multiprocessing de Python
+	2. Ajouter des métadonnées
+	3. Comparer la version de Léo et la mienne

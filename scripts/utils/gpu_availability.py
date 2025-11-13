@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
+
 import torch
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(f"Les calculs seront lancés sur {DEVICE}")
+for i in range(torch.cuda.device_count()):
+    print(i, torch.cuda.get_device_name(i))

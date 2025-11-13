@@ -6,9 +6,9 @@
 
 Le modèle TARTES (Two-streAm Radiative TransfEr in Snow) calcule l'albédo spectral et les profils d'absorption spectrale d'un manteau neigeux. Chaque couche de neige est caractérisée par sa surface spécifique, sa densité et sa teneur en impuretés... *TODO*
 
-## Description du modèle
+## Présentation du modèle
 
-*Description générale*
+*Description générale du modèle utilisé*
 
 ### Entrées et sorties
 
@@ -67,6 +67,8 @@ Si l’installation s’est bien déroulée, vous devriez voir *(base)* au débu
 ### Création de l'environnement
 
 Le fichier *requirements.txt* liste les dépendances nécessaires à l'exécution du code. Le site https://anaconda.org permet de savoir si les versions des librairies utilisées sont toujours d'actualité.
+
+**Version de Python utilisée : 3.13.8**
 
 1. Créer un fichier *.condarc* pour y définir quelques channels :
 ```
@@ -199,6 +201,8 @@ screen -dmS preprocessing bash launch.sh
 L'avancement du prétraitement est accessible via le fichier *monitoring.txt*. Pour un jeu de données de 10 ans, sur les Alpes et les Pyrénées, cela doit durer environ 12h.
 
 ### Calculer la moyenne et l'écart-type du jeu de données
+
+**ERREUR : Il faut calculer la moyenne et l'écart-type uniquement sur le jeu de données d'entrainement.**
 
 Se placer dans : `/home/torrenta/TARTES-Emulator/scripts/normalization`
 
