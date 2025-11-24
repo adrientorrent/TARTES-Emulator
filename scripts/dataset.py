@@ -1,58 +1,97 @@
 #!/usr/bin/env python3
 
-import pandas as pd
-import numpy as np
 import torch
 from torch.utils.data import IterableDataset
-from normalization.normalize import Normalizer
+
+import pandas as pd
+import numpy as np
+
+from normalization.normalize import Norm
+
+from typing import Iterator
+
+
+# TODO: s'assurer qu'à chaque iter il ne recharge pas tout le fichier
 
 
 class TartesDataset(IterableDataset):
+    """Description"""
 
-    def __init__(self, parquet_files_groupby_year):
+    sampletype = tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+
+    def __init__(self, files_paths: list[str]):
         super().__init__()
-        self.files = parquet_files_groupby_year
-        self.normalizer = Normalizer()
+        self.files_paths = files_paths
+        self.norm = Norm()
 
-    def get_snowpack(self, raw_sample):
-        # build and normalize snowpack image
-        snowpack = np.reshape(raw_sample[0:250], (5, 50, 1))
-        snowpack = np.nan_to_num(snowpack, nan=-1)
-        snow_layers = ~np.isnan([[[raw_sample[i]] for i in range(50)]])
-        snowpack = np.vstack((snowpack, snow_layers))
-        snowpack = self.normalizer.normalize_snowpack(snowpack)
-        snowpack_tensor = torch.from_numpy(snowpack).float()
-        return snowpack_tensor
+    def normalize(self, x: np.ndarray) -> np.ndarray:
+        """
+        Description
 
-    def get_sun(self, raw_sample):
-        # build and normalize sun data
-        sun = np.array(raw_sample[250:253])
-        sun[0] = self.normalizer.normalize_direct_sw(sun[0])
-        sun[1] = self.normalizer.normalize_diffuse_sw(sun[1])
-        sun_tensor = torch.from_numpy(sun).float()
-        return sun_tensor
+        --- currently ---
+        x = [dz1, ..., conc_dust50, direct_sw, diffuse_sw, cos_sza, albedo]
+        """
+        x[:, 0:50] = self.norm.normalize_dz(x[:, 0:50])
+        x[:, 50:100] = self.norm.normalize_ssa(x[:, 50:100])
+        x[:, 100:150] = self.norm.normalize_density(x[:, 100:150])
+        x[:, 150:200] = self.norm.normalize_conc_soot(x[:, 150:200])
+        x[:, 200:250] = self.norm.normalize_conc_dust(x[:, 200:250])
+        x[:, 250] = self.norm.normalize_direct_sw(x[:, 250])
+        x[:, 251] = self.norm.normalize_diffuse_sw(x[:, 251])
+        return x
 
-    def get_albedo(self, raw_sample):
-        # get albedo label
-        return torch.tensor([raw_sample[-1]]).float()
+    @staticmethod
+    def add_snow_layers(x: np.ndarray) -> np.ndarray:
+        """Add a boolean value indicating the presence of snow to each layer"""
+        return np.hstack((~np.isnan(x[:, 0:50]), x))
 
-    def __iter__(self):
-        for year in self.files:
-            for file in year:
-                # read dataframe
-                df = pd.read_parquet(file)
-                # and shuffle df
-                df = df.sample(axis='index', frac=1).reset_index(drop=True)
-                for idx in range(len(df)):
-                    # get row
-                    row = df.iloc[idx].values
-                    # snowpack
-                    snowpack_tensor = self.get_snowpack(row)
-                    # sun
-                    sun_tensor = self.get_sun(row)
-                    # albedo broadband
-                    albedo_tensor = self.get_albedo(row)
-                    # yield sample
-                    yield snowpack_tensor, sun_tensor, albedo_tensor
-                # clean ram
-                del df
+    @staticmethod
+    def fill_nan(x: np.ndarray) -> np.ndarray:
+        """Fill nan values with -1"""
+        return np.nan_to_num(x, nan=-1)
+
+    @staticmethod
+    def build_snowpack_tensor(row: np.ndarray) -> torch.Tensor:
+        """Description"""
+        return torch.from_numpy(np.reshape(row[0:300], (6, 50, 1)))
+
+    @staticmethod
+    def build_sun_tensor(row: np.ndarray) -> torch.Tensor:
+        """Description"""
+        return torch.from_numpy(row[300:303])
+
+    @staticmethod
+    def build_albedo_tensor(row: np.ndarray) -> torch.Tensor:
+        """Description"""
+        return torch.from_numpy(row[303:304])
+
+    def __iter__(self) -> Iterator[sampletype]:
+        """Description"""
+        for file_path in self.files_paths:
+
+            # --- read dataframe ---
+            df = pd.read_parquet(file_path)
+
+            # --- processing data before looping through rows ---
+            # suffle
+            df = df.sample(axis='index', frac=1).reset_index(drop=True)
+            # get numpy array (remove meta data)
+            tab = df.values[:, 5:].astype(np.float64)
+            # normalize
+            tab = self.normalize(tab)
+            # add snow layers
+            tab = self.add_snow_layers(tab)
+            # fill nan values
+            tab = self.fill_nan(tab)
+            # GPUs accept only 32 bit
+            tab = tab.astype(np.float32)
+
+            # --- loop on each row ---
+            for row in tab:
+                snowpack_tensor = self.build_snowpack_tensor(row)
+                sun_tensor = self.build_sun_tensor(row)
+                albedo_tensor = self.build_albedo_tensor(row)
+                yield snowpack_tensor, sun_tensor, albedo_tensor
+
+            # --- clean memory ---
+            del df

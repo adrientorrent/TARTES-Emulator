@@ -2,7 +2,7 @@
 
 import time
 import torch
-from utils.get_parquet_files import get_parquet_paths
+from scripts.utils.data_selection import get_parquet_paths
 from dataset import TartesDataset
 from torch.utils.data import DataLoader
 from model import TartesEmulator

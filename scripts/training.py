@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
 import time
+import logging
+
 import torch
 from torch.nn import Module, MSELoss
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MeanSquaredError
 from tqdm import tqdm
+
+
+"""General description"""
 
 
 def evaluate(
@@ -16,7 +21,7 @@ def evaluate(
     metric: MeanSquaredError,
     device: torch.device,
     desc: str,
-    debug: bool
+    logger: logging.Logger
 ) -> tuple[float, float]:
     '''
     Model evaluation
@@ -32,7 +37,8 @@ def evaluate(
     # loop on batches
     for X_snowpack, X_sun, y in tqdm(dataloader, desc=desc):
         # move tensors to the device
-        X_snowpack, X_sun, y = X_snowpack.to(device), X_sun.to(device), y.to(device)
+        X_snowpack, X_sun = X_snowpack.to(device), X_sun.to(device)
+        y = y.to(device)
         # predict
         y_hat = model(X_snowpack, X_sun)
         # loss
@@ -44,7 +50,7 @@ def evaluate(
         # update metric
         metric.update(preds=y_hat, target=y)
 
-        if debug:
+        if logger.level == logging.DEBUG:
             break
 
     # mean loss
@@ -64,7 +70,7 @@ def train(
     metric: MeanSquaredError,
     device: torch.device,
     epoch: int,
-    debug: bool
+    logger: logging.Logger
 ) -> Module:
     '''
     Model training over 1 epoch
@@ -84,7 +90,8 @@ def train(
     progress_bar = tqdm(train_dataloader, desc="Training")
     for X_snowpack, X_sun, y in progress_bar:
         # move tensors to the device
-        X_snowpack, X_sun, y = X_snowpack.to(device), X_sun.to(device), y.to(device)
+        X_snowpack, X_sun = X_snowpack.to(device), X_sun.to(device)
+        y = y.to(device)
         # predict
         y_hat = model(X_snowpack, X_sun)
         # loss
@@ -101,7 +108,7 @@ def train(
         # progress bar update
         progress_bar.set_postfix({"mse": f"{(running_loss / count):.4f}"})
 
-        if debug:
+        if logger.level == logging.DEBUG:
             break
 
     # --- EVALUATION ---
@@ -119,7 +126,7 @@ def train(
             metric=metric,
             device=device,
             desc="Evaluation on training data",
-            debug=debug
+            logger=logger
         )
         # Evaluation based on testing data
         test_loss, test_metric = evaluate(
@@ -129,7 +136,7 @@ def train(
             metric=metric,
             device=device,
             desc="Evaluation on testing data",
-            debug=debug
+            logger=logger
         )
 
     # --- RESULTS ---

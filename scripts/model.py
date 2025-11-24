@@ -26,7 +26,7 @@ class TartesEmulator(nn.Module):
         self.output = nn.Linear(32, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
-        
+
     def _forward_conv(self, x_snowpack):
         # conv layers forward
         x_snowpack = self.conv1(x_snowpack)
