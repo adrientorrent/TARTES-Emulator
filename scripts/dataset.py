@@ -8,10 +8,7 @@ from normalization.normalize import Norm
 from typing import Iterator
 
 import torch
-from torch.utils.data import IterableDataset
-
-from threading import Thread
-from queue import Queue
+from torch.utils.data import IterableDataset, get_worker_info
 
 
 class TartesDataset(IterableDataset):
@@ -19,18 +16,11 @@ class TartesDataset(IterableDataset):
 
     sampletype = tuple[torch.Tensor, torch.Tensor, torch.Tensor]
 
-    def __init__(self, files_paths: list[str], batch_size: int,
-                 buffer_size: int):
-        """
-        Description
-
-        buffer_size: Number of batchs to preload
-        """
+    def __init__(self, files_paths: list[str]):
+        """Description"""
         super().__init__()
         self.files_paths = files_paths
         self.norm = Norm()
-        self.batch_size = batch_size
-        self.buffer_size = buffer_size
 
     def normalize(self, x: np.ndarray) -> np.ndarray:
         """
@@ -61,7 +51,7 @@ class TartesDataset(IterableDataset):
     @staticmethod
     def build_snowpack_tensor(row: np.ndarray) -> torch.Tensor:
         """Description"""
-        return torch.from_numpy(np.reshape(row[0:300], (6, 50, 1)))
+        return torch.from_numpy(np.reshape(row[0:300], (6, 50)))
 
     @staticmethod
     def build_sun_tensor(row: np.ndarray) -> torch.Tensor:
@@ -73,58 +63,48 @@ class TartesDataset(IterableDataset):
         """Description"""
         return torch.from_numpy(row[303:304])
 
-    def loader(self, queue: Queue):
+    def loader(self, file_path: str) -> np.ndarray:
         """Description"""
 
-        for file_path in self.files_paths:
+        # read dataframe
+        df = pd.read_parquet(file_path)
+        # suffle
+        df = df.sample(axis='index', frac=1).reset_index(drop=True)
+        # get numpy array (remove meta data)
+        tab = df.values[:, 5:].astype(np.float64)
+        # clean ram
+        del df
+        # normalize
+        tab = self.normalize(tab)
+        # add snow layers
+        tab = self.add_snow_layers(tab)
+        # fill nan values
+        tab = self.fill_nan(tab)
+        # GPUs accept only 32 bit
+        tab = tab.astype(np.float32)
 
-            # --- read dataframe ---
-            df = pd.read_parquet(file_path)
-
-            # --- processing data before looping through rows ---
-            # suffle
-            df = df.sample(axis='index', frac=1).reset_index(drop=True)
-            # get numpy array (remove meta data)
-            tab = df.values[:, 5:].astype(np.float64)
-            # normalize
-            tab = self.normalize(tab)
-            # add snow layers
-            tab = self.add_snow_layers(tab)
-            # fill nan values
-            tab = self.fill_nan(tab)
-            # GPUs accept only 32 bit
-            tab = tab.astype(np.float32)
-
-            # --- loop on each row ---
-            for row in tab:
-                queue.put(row)
-
-            # --- clean memory ---
-            del df
-            del tab
-
-        queue.put(None)
+        return tab
 
     def __iter__(self) -> Iterator[sampletype]:
         """Description"""
 
-        queue = Queue(maxsize=(self.batch_size * self.buffer_size))
-        loader_process = Thread(target=self.loader, args=(queue, ))
-        loader_process.daemon = True
-        loader_process.start()
+        worker_info = get_worker_info()
+        worker_files_path: list[str]
 
-        data_available = True
-        while data_available:
+        if worker_info is None:
+            worker_files_path = self.files_paths
+        else:
+            num_workers = worker_info.num_workers
+            worker_id = worker_info.id
+            per_worker = int(np.ceil(len(self.files_paths) / num_workers))
+            start = worker_id * per_worker
+            end = min(start + per_worker, len(self.files_paths))
+            worker_files_path = self.files_paths[start:end]
 
-            row = queue.get()
-
-            if row is None:
-                data_available = False
-                break
-
-            snowpack_tensor = self.build_snowpack_tensor(row)
-            sun_tensor = self.build_sun_tensor(row)
-            albedo_tensor = self.build_albedo_tensor(row)
-            yield snowpack_tensor, sun_tensor, albedo_tensor
-
-        loader_process.join()
+        for file_path in worker_files_path:
+            tab = self.loader(file_path)
+            for row in tab:
+                snowpack_tensor = self.build_snowpack_tensor(row)
+                sun_tensor = self.build_sun_tensor(row)
+                albedo_tensor = self.build_albedo_tensor(row)
+                yield snowpack_tensor, sun_tensor, albedo_tensor

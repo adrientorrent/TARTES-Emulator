@@ -15,15 +15,6 @@ General description
 """
 
 
-# --- init logger ---
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
 # --- useful paths ---
 
 OUT_DIR = "/home/torrenta/TARTES-Emulator/data/normalization"
@@ -43,8 +34,7 @@ def _sub_mean_and_std(paths: list[str]):
         sub_var_dict[x] = {"count": 0, "sum": 0, "sum2": 0}
 
     # read 12 files on by one
-    for idx, path in enumerate(paths):
-        logger.debug(f"{idx+1}/{len(paths)}")
+    for path in paths:
         # read file
         df = pd.read_parquet(path)
         # snowpack
@@ -65,7 +55,10 @@ def _sub_mean_and_std(paths: list[str]):
     return sub_var_dict
 
 
-def mean_and_std(files_paths: list[str]) -> None:
+def mean_and_std(
+        files_paths: list[str],
+        logger: logging.Logger
+) -> None:
     """Description"""
 
     # initialize variables
@@ -121,12 +114,15 @@ def mean_and_std(files_paths: list[str]) -> None:
     return
 
 
-def trigger_mean_and_std(files_paths: list[str]) -> None:
+def trigger_mean_and_std(
+        files_paths: list[str],
+        logger: logging.Logger
+) -> None:
     """Description"""
 
     if not exists(OUT_PATH):
         logger.debug("No previous data")
-        mean_and_std(files_paths=files_paths)
+        mean_and_std(files_paths=files_paths, logger=logger)
         return
 
     # get previous files paths
@@ -139,6 +135,6 @@ def trigger_mean_and_std(files_paths: list[str]) -> None:
     logger.debug("Checking if there are differents")
     if set(files_paths) != set(prev_files_paths):
         logger.debug("There are: lauching mean_and_std function")
-        mean_and_std(files_paths=files_paths)
+        mean_and_std(files_paths=files_paths, logger=logger)
 
     return

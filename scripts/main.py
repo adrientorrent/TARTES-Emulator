@@ -32,53 +32,68 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
+    logger.info("Gathering data")
+
     # Files selection
-    logger.info("Data selection")
+    logger.debug("Data selection")
     train_files, test_files, _ = train_test_split(train=1, test=1, seed=2025)
 
     # Normalization
-    logger.info("Computing normalization stats")
-    trigger_mean_and_std(files_paths=train_files)
-
-    # Batch and buffer
-    BATCH_SIZE = 128
-    BUFFER_SIZE = 50
+    logger.debug("Computing normalization stats")
+    trigger_mean_and_std(files_paths=train_files, logger=logger)
 
     # Datasets
-    logger.info("Creating datasets")
-    train_dataset = TartesDataset(files_paths=train_files,
-                                  batch_size=BATCH_SIZE,
-                                  buffer_size=BUFFER_SIZE)
-    test_dataset = TartesDataset(files_paths=test_files,
-                                 batch_size=BATCH_SIZE,
-                                 buffer_size=BUFFER_SIZE)
+    logger.debug("Creating datasets")
+    train_dataset = TartesDataset(files_paths=train_files)
+    test_dataset = TartesDataset(files_paths=test_files)
 
     # Dataloaders
-    logger.info("Creating dataloaders")
-    train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE,
-                                  num_workers=0, drop_last=False)
-    test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE,
-                                 num_workers=0, drop_last=False)
+    logger.debug("Creating dataloaders")
+    BATCH_SIZE = 128
+    NUM_WORKERS = 4
+    PIN_MEMORY = True
+    PREFETCH_FACTOR = 4
+    PERSISTENT_WORKERS = True
+    DROP_LAST = False
+    train_dataloader = DataLoader(
+        dataset=train_dataset,
+        batch_size=BATCH_SIZE,
+        num_workers=NUM_WORKERS,
+        pin_memory=PIN_MEMORY,
+        prefetch_factor=PREFETCH_FACTOR,
+        persistent_workers=PERSISTENT_WORKERS,
+        drop_last=DROP_LAST
+    )
+    test_dataloader = DataLoader(
+        dataset=test_dataset,
+        batch_size=BATCH_SIZE,
+        num_workers=NUM_WORKERS,
+        pin_memory=PIN_MEMORY,
+        prefetch_factor=PREFETCH_FACTOR,
+        persistent_workers=PERSISTENT_WORKERS,
+        drop_last=DROP_LAST
+    )
 
     # 1st batch shapes
-    for X_snowpack, X_sun, y in train_dataloader:
-        logger.info("--- BATCH INFOS | SHAPES ---")
-        logger.info(f"X_snowpack: {X_snowpack.shape}")
-        logger.info(f"X_sun: {X_sun.shape}")
-        logger.info(f"y: {y.shape}")
-        break
+    if logger.getEffectiveLevel() == logging.DEBUG:
+        for X_snowpack, X_sun, y in train_dataloader:
+            logger.debug("--- BATCH INFOS | SHAPES ---")
+            logger.debug(f"X_snowpack: {X_snowpack.shape}")
+            logger.debug(f"X_sun: {X_sun.shape}")
+            logger.debug(f"y: {y.shape}")
+            break
 
     # Model
-    logger.info("Creating model")
+    logger.info("Model architecture")
     tartes_model = TartesEmulator()
     summary(
         tartes_model,
-        input_size=[(1, 6, 50, 1), (1, 3)],
+        input_size=[(1, 6, 50), (1, 3)],
         col_names=["kernel_size", "input_size", "output_size", "num_params"]
     )
 
     # Loss, optimizer and metric
-    logger.info("Creating loss, optimizer and metric")
+    logger.debug("Creating loss, optimizer and metric")
     loss_fn = MSELoss()
     optimizer = Adam(tartes_model.parameters())
     metric = MeanSquaredError()
@@ -90,18 +105,20 @@ def main():
     metric = metric.to(DEVICE)
 
     # Forward pass
-    for X_snowpack, X_sun, y in train_dataloader:
-        X_snowpack, X_sun = X_snowpack.to(DEVICE), X_sun.to(DEVICE)
-        y_hat = tartes_model(X_snowpack, X_sun)
-        logger.info("--- FORWARD PASS | SHAPES ---")
-        logger.info(f"TARTES ALBEDO: {y.shape}")
-        logger.info(f"MODEL PREDICTION: {y_hat.shape}")
-        logger.info("--- FORWARD PASS | INFERENCE ---")
-        logger.info(f"TARTES ALBEDO: {y[0][0]}")
-        logger.info(f"MODEL PREDICTION: {y_hat[0][0]}")
-        break
+    if logger.getEffectiveLevel() == logging.DEBUG:
+        for X_snowpack, X_sun, y in train_dataloader:
+            X_snowpack, X_sun = X_snowpack.to(DEVICE), X_sun.to(DEVICE)
+            y_hat = tartes_model(X_snowpack, X_sun)
+            logger.debug("--- FORWARD PASS | SHAPES ---")
+            logger.debug(f"TARTES ALBEDO: {y.shape}")
+            logger.debug(f"MODEL PREDICTION: {y_hat.shape}")
+            logger.debug("--- FORWARD PASS | INFERENCE ---")
+            logger.debug(f"TARTES ALBEDO: {y[0][0]}")
+            logger.debug(f"MODEL PREDICTION: {y_hat[0][0]}")
+            break
 
     # Training
+    logger.info("Start training")
     epochs = 1
     for ep in range(epochs):
         tartes_model = train(
@@ -117,9 +134,10 @@ def main():
         )
 
     # Save model parameters (save full model ?)
-    if logger.level == logging.INFO:
+    if logger.getEffectiveLevel() == logging.INFO:
         PATH = "/home/torrenta/TARTES-Emulator/data/model/tartes-model.pt"
         torch.save(tartes_model.state_dict(), PATH)
+        logger.info(f"Model save in {PATH}")
 
     t1 = time.time()
     logger.info(f"Run time: {(t1 - t0):.2f} seconds")

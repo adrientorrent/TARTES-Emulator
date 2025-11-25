@@ -20,8 +20,7 @@ def evaluate(
     loss_function: MSELoss,
     metric: MeanSquaredError,
     device: torch.device,
-    desc: str,
-    logger: logging.Logger
+    desc: str
 ) -> tuple[float, float]:
     '''
     Model evaluation
@@ -49,9 +48,6 @@ def evaluate(
         count += batch_size
         # update metric
         metric.update(preds=y_hat, target=y)
-
-        if logger.level == logging.DEBUG:
-            break
 
     # mean loss
     mean_loss = running_loss / count
@@ -81,6 +77,7 @@ def train(
     start_time = time.time()
 
     # --- LEARNING ---
+    logger.info("Learning")
 
     # turn on training mode
     model.train()
@@ -106,12 +103,10 @@ def train(
         running_loss += loss.item() * batch_size
         count += batch_size
         # progress bar update
-        progress_bar.set_postfix({"mse": f"{(running_loss / count):.4f}"})
-
-        if logger.level == logging.DEBUG:
-            break
+        progress_bar.set_postfix({"mse": f"{running_loss / count}"})
 
     # --- EVALUATION ---
+    logger.info("Evaluation")
 
     # turn off training mode
     model.eval()
@@ -125,8 +120,7 @@ def train(
             loss_function=loss_function,
             metric=metric,
             device=device,
-            desc="Evaluation on training data",
-            logger=logger
+            desc="Evaluation on training data"
         )
         # Evaluation based on testing data
         test_loss, test_metric = evaluate(
@@ -135,17 +129,16 @@ def train(
             loss_function=loss_function,
             metric=metric,
             device=device,
-            desc="Evaluation on testing data",
-            logger=logger
+            desc="Evaluation on testing data"
         )
 
     # --- RESULTS ---
 
     elapsed_time = time.time() - start_time
-    print(f"--- Epoch {epoch} | Elapsed Time : {elapsed_time:.2f} secondes ---")
-    print(f"Train Loss : {train_loss:.5f}")
-    print(f"Train Metric : {train_metric:.5f}")
-    print(f"Test Loss : {test_loss:.5f}")
-    print(f"Test Metric : {test_metric:.5f}")
+    print(f"--- Epoch {epoch} | Elapsed Time : {elapsed_time:.2f} s ---")
+    print(f"Train Loss : {train_loss}")
+    print(f"Train Metric : {train_metric}")
+    print(f"Test Loss : {test_loss}")
+    print(f"Test Metric : {test_metric}")
 
     return model
