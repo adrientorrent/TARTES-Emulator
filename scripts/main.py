@@ -40,14 +40,21 @@ def main():
     logger.info("Computing normalization stats")
     trigger_mean_and_std(files_paths=train_files)
 
+    # Batch and buffer
+    BATCH_SIZE = 128
+    BUFFER_SIZE = 50
+
     # Datasets
     logger.info("Creating datasets")
-    train_dataset = TartesDataset(files_paths=train_files)
-    test_dataset = TartesDataset(files_paths=test_files)
+    train_dataset = TartesDataset(files_paths=train_files,
+                                  batch_size=BATCH_SIZE,
+                                  buffer_size=BUFFER_SIZE)
+    test_dataset = TartesDataset(files_paths=test_files,
+                                 batch_size=BATCH_SIZE,
+                                 buffer_size=BUFFER_SIZE)
 
     # Dataloaders
     logger.info("Creating dataloaders")
-    BATCH_SIZE = 128
     train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE,
                                   num_workers=0, drop_last=False)
     test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE,

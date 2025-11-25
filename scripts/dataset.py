@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import torch
-from torch.utils.data import IterableDataset
-
 import pandas as pd
 import numpy as np
 
@@ -10,19 +7,30 @@ from normalization.normalize import Norm
 
 from typing import Iterator
 
+import torch
+from torch.utils.data import IterableDataset
 
-# TODO: s'assurer qu'à chaque iter il ne recharge pas tout le fichier
+from threading import Thread
+from queue import Queue
 
 
 class TartesDataset(IterableDataset):
-    """Description"""
+    """General description"""
 
     sampletype = tuple[torch.Tensor, torch.Tensor, torch.Tensor]
 
-    def __init__(self, files_paths: list[str]):
+    def __init__(self, files_paths: list[str], batch_size: int,
+                 buffer_size: int):
+        """
+        Description
+
+        buffer_size: Number of batchs to preload
+        """
         super().__init__()
         self.files_paths = files_paths
         self.norm = Norm()
+        self.batch_size = batch_size
+        self.buffer_size = buffer_size
 
     def normalize(self, x: np.ndarray) -> np.ndarray:
         """
@@ -65,8 +73,9 @@ class TartesDataset(IterableDataset):
         """Description"""
         return torch.from_numpy(row[303:304])
 
-    def __iter__(self) -> Iterator[sampletype]:
+    def loader(self, queue: Queue):
         """Description"""
+
         for file_path in self.files_paths:
 
             # --- read dataframe ---
@@ -88,10 +97,34 @@ class TartesDataset(IterableDataset):
 
             # --- loop on each row ---
             for row in tab:
-                snowpack_tensor = self.build_snowpack_tensor(row)
-                sun_tensor = self.build_sun_tensor(row)
-                albedo_tensor = self.build_albedo_tensor(row)
-                yield snowpack_tensor, sun_tensor, albedo_tensor
+                queue.put(row)
 
             # --- clean memory ---
             del df
+            del tab
+
+        queue.put(None)
+
+    def __iter__(self) -> Iterator[sampletype]:
+        """Description"""
+
+        queue = Queue(maxsize=(self.batch_size * self.buffer_size))
+        loader_process = Thread(target=self.loader, args=(queue, ))
+        loader_process.daemon = True
+        loader_process.start()
+
+        data_available = True
+        while data_available:
+
+            row = queue.get()
+
+            if row is None:
+                data_available = False
+                break
+
+            snowpack_tensor = self.build_snowpack_tensor(row)
+            sun_tensor = self.build_sun_tensor(row)
+            albedo_tensor = self.build_albedo_tensor(row)
+            yield snowpack_tensor, sun_tensor, albedo_tensor
+
+        loader_process.join()
