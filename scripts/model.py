@@ -28,11 +28,17 @@ class TartesEmulator(nn.Module):
                                kernel_size=5, padding=2)
         self.bn4 = nn.BatchNorm1d(256)
 
+        self.conv5 = nn.Conv1d(in_channels=256, out_channels=512,
+                               kernel_size=3, padding=1)
+        self.bn5 = nn.BatchNorm1d(512)
+
         self.gmp = nn.AdaptiveMaxPool1d(1)
         self.flatten = nn.Flatten()
 
         self.snowpack_fc = nn.Sequential(
-            nn.Linear(256, 256),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.Linear(512, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
@@ -76,6 +82,9 @@ class TartesEmulator(nn.Module):
 
         x_snowpack = self.conv4(x_snowpack)
         x_snowpack = self.bn4(x_snowpack)
+
+        x_snowpack = self.conv5(x_snowpack)
+        x_snowpack = self.bn5(x_snowpack)
 
         x_snowpack = self.gmp(x_snowpack)
         x_snowpack = self.flatten(x_snowpack)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import pandas as pd
 import numpy as np
+import polars as pl
 
 from normalization.normalize import Norm
 
@@ -67,23 +67,21 @@ class TartesDataset(IterableDataset):
         """Description"""
 
         # read dataframe
-        df = pd.read_parquet(file_path)
-        # suffle
-        df = df.sample(axis='index', frac=1).reset_index(drop=True)
-        # get numpy array (remove meta data)
-        tab = df.values[:, 5:].astype(np.float64)
-        # clean ram
-        del df
+        df = pl.read_parquet(file_path)
+        # shuffle
+        df = df.sample(fraction=1.0, shuffle=True)
+        # convert to numpy array
+        arr = df[:, 5:].to_numpy().astype(np.float64)
         # normalize
-        tab = self.normalize(tab)
+        arr = self.normalize(arr)
         # add snow layers
-        tab = self.add_snow_layers(tab)
+        arr = self.add_snow_layers(arr)
         # fill nan values
-        tab = self.fill_nan(tab)
+        arr = self.fill_nan(arr)
         # GPUs accept only 32 bit
-        tab = tab.astype(np.float32)
+        arr = arr.astype(np.float32)
 
-        return tab
+        return arr
 
     def __iter__(self) -> Iterator[sampletype]:
         """Description"""
@@ -102,8 +100,8 @@ class TartesDataset(IterableDataset):
             worker_files_path = self.files_paths[start:end]
 
         for file_path in worker_files_path:
-            tab = self.loader(file_path)
-            for row in tab:
+            arr = self.loader(file_path)
+            for row in arr:
                 snowpack_tensor = self.build_snowpack_tensor(row)
                 sun_tensor = self.build_sun_tensor(row)
                 albedo_tensor = self.build_albedo_tensor(row)

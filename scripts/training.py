@@ -136,9 +136,9 @@ def train(
 
     elapsed_time = time.time() - start_time
     print(f"--- Epoch {epoch} | Elapsed Time : {elapsed_time:.2f} s ---")
-    print(f"Train Loss : {train_loss}")
-    print(f"Train Metric : {train_metric}")
-    print(f"Test Loss : {test_loss}")
-    print(f"Test Metric : {test_metric}")
+    print(f"Train Loss: {train_loss}")
+    print(f"Train Metric: {train_metric}")
+    print(f"Test Loss: {test_loss}")
+    print(f"Test Metric: {test_metric}")
 
     return model

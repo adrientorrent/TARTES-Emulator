@@ -8,6 +8,7 @@ from multiprocessing import Pool
 
 import pandas as pd
 import numpy as np
+import polars as pl
 
 
 """
@@ -35,22 +36,39 @@ def _sub_mean_and_std(paths: list[str]):
 
     # read 12 files on by one
     for path in paths:
+
         # read file
-        df = pd.read_parquet(path)
+        polars_df = pl.read_parquet(path)
+
         # snowpack
         for x in snowpack:
             for i in range(50):
-                sub_var_dict[x]["sum"] += df[x+str(i+1)].sum()
-                sub_var_dict[x]["sum2"] += df[x+str(i+1)].pow(2).sum()
-                sub_var_dict[x]["count"] += df.shape[0]
-                sub_var_dict[x]["count"] -= df[x+str(i+1)].isna().sum()
+
+                xi = x+str(i + 1)
+
+                polars_sum = polars_df.select(pl.sum(xi))
+                sub_var_dict[x]["sum"] += polars_sum.item()
+
+                polars_sum2 = polars_df.select((pl.col(xi)**2).sum())
+                sub_var_dict[x]["sum2"] += polars_sum2.item()
+
+                polars_count = polars_df.select(pl.count(xi))
+                sub_var_dict[x]["count"] += polars_count.item()
+
         # shortwaves
         for x in shortwaves:
-            sub_var_dict[x]["sum"] += df[x].sum()
-            sub_var_dict[x]["sum2"] += df[x].pow(2).sum()
-            sub_var_dict[x]["count"] += df.shape[0]
+
+            polars_sum = polars_df.select(pl.sum(x))
+            sub_var_dict[x]["sum"] += polars_sum.item()
+
+            polars_sum2 = polars_df.select((pl.col(x)**2).sum())
+            sub_var_dict[x]["sum2"] += polars_sum2.item()
+
+            polars_count = polars_df.select(pl.count(x))
+            sub_var_dict[x]["count"] += polars_count.item()
+
         # clean ram
-        del df
+        del polars_df
 
     return sub_var_dict
 

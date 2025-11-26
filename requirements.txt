@@ -6,6 +6,7 @@ netcdf4==1.7.2
 fastparquet==2024.11.0
 dask-core==2025.10.0
 pyarrow==20.0.0
+polars==1.35.2
 scikit-learn==1.7.2
 pytorch-gpu==2.5.1
 torchmetrics==1.8.2

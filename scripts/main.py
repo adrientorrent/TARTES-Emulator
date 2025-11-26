@@ -49,10 +49,10 @@ def main():
 
     # Dataloaders
     logger.debug("Creating dataloaders")
-    BATCH_SIZE = 128
-    NUM_WORKERS = 4
+    BATCH_SIZE = 256
+    NUM_WORKERS = 6
     PIN_MEMORY = True
-    PREFETCH_FACTOR = 4
+    PREFETCH_FACTOR = 16
     PERSISTENT_WORKERS = True
     DROP_LAST = False
     train_dataloader = DataLoader(
