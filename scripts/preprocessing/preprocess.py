@@ -136,6 +136,9 @@ def preprocess_function(forcing_path: str, pro_path: str,
     col = id_col + snow_col + sun_col + albedo_col
     df = df[col]
 
+    # shuffle data (disrupt day cycle)
+    df = df.sample(axis='index', frac=1).reset_index(drop=True)
+
     # add metadata
     logger.debug("Adding metadata")
     df.attrs["description"] = "description"

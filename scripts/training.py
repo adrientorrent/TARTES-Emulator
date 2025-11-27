@@ -114,14 +114,14 @@ def train(
     # disable gradient calculation
     with torch.no_grad():
         # Evaluation based on training data
-        train_loss, train_metric = evaluate(
-            dataloader=train_dataloader,
-            model=model,
-            loss_function=loss_function,
-            metric=metric,
-            device=device,
-            desc="Evaluation on training data"
-        )
+        # train_loss, train_metric = evaluate(
+        #     dataloader=train_dataloader,
+        #     model=model,
+        #     loss_function=loss_function,
+        #     metric=metric,
+        #     device=device,
+        #     desc="Evaluation on training data"
+        # )
         # Evaluation based on testing data
         test_loss, test_metric = evaluate(
             dataloader=test_dataloader,
@@ -136,8 +136,8 @@ def train(
 
     elapsed_time = time.time() - start_time
     print(f"--- Epoch {epoch} | Elapsed Time : {elapsed_time:.2f} s ---")
-    print(f"Train Loss: {train_loss}")
-    print(f"Train Metric: {train_metric}")
+    # print(f"Train Loss: {train_loss}")
+    # print(f"Train Metric: {train_metric}")
     print(f"Test Loss: {test_loss}")
     print(f"Test Metric: {test_metric}")
 

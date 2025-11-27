@@ -36,7 +36,7 @@ def main():
 
     # Files selection
     logger.debug("Data selection")
-    train_files, test_files, _ = train_test_split(train=1, test=1, seed=2025)
+    train_files, test_files, _ = train_test_split(train=15, test=5, seed=2025)
 
     # Normalization
     logger.debug("Computing normalization stats")
@@ -49,12 +49,14 @@ def main():
 
     # Dataloaders
     logger.debug("Creating dataloaders")
-    BATCH_SIZE = 256
-    NUM_WORKERS = 6
+
+    BATCH_SIZE = 512
+    NUM_WORKERS = 16
+    PREFETCH_FACTOR = 32
     PIN_MEMORY = True
-    PREFETCH_FACTOR = 16
     PERSISTENT_WORKERS = True
     DROP_LAST = False
+
     train_dataloader = DataLoader(
         dataset=train_dataset,
         batch_size=BATCH_SIZE,
@@ -64,6 +66,7 @@ def main():
         persistent_workers=PERSISTENT_WORKERS,
         drop_last=DROP_LAST
     )
+
     test_dataloader = DataLoader(
         dataset=test_dataset,
         batch_size=BATCH_SIZE,
@@ -76,16 +79,21 @@ def main():
 
     # 1st batch shapes
     if logger.getEffectiveLevel() == logging.DEBUG:
+
         for X_snowpack, X_sun, y in train_dataloader:
+
             logger.debug("--- BATCH INFOS | SHAPES ---")
             logger.debug(f"X_snowpack: {X_snowpack.shape}")
             logger.debug(f"X_sun: {X_sun.shape}")
             logger.debug(f"y: {y.shape}")
+
             break
 
     # Model
     logger.info("Model architecture")
+
     tartes_model = TartesEmulator()
+
     summary(
         tartes_model,
         input_size=[(1, 6, 50), (1, 3)],
@@ -101,25 +109,32 @@ def main():
     # Device
     DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
     logger.info(f"The following experiments will be launched on {DEVICE}")
+    logger.info(f"{DEVICE} is a {torch.cuda.get_device_name(DEVICE.index)}")
+
     tartes_model = tartes_model.to(DEVICE)
     metric = metric.to(DEVICE)
 
     # Forward pass
     if logger.getEffectiveLevel() == logging.DEBUG:
+
         for X_snowpack, X_sun, y in train_dataloader:
+
             X_snowpack, X_sun = X_snowpack.to(DEVICE), X_sun.to(DEVICE)
             y_hat = tartes_model(X_snowpack, X_sun)
+
             logger.debug("--- FORWARD PASS | SHAPES ---")
             logger.debug(f"TARTES ALBEDO: {y.shape}")
             logger.debug(f"MODEL PREDICTION: {y_hat.shape}")
+
             logger.debug("--- FORWARD PASS | INFERENCE ---")
             logger.debug(f"TARTES ALBEDO: {y[0][0]}")
             logger.debug(f"MODEL PREDICTION: {y_hat[0][0]}")
+
             break
 
     # Training
     logger.info("Start training")
-    epochs = 1
+    epochs = 10
     for ep in range(epochs):
         tartes_model = train(
             train_dataloader=train_dataloader,

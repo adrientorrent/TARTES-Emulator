@@ -68,8 +68,6 @@ class TartesDataset(IterableDataset):
 
         # read dataframe
         df = pl.read_parquet(file_path)
-        # shuffle
-        df = df.sample(fraction=1.0, shuffle=True)
         # convert to numpy array
         arr = df[:, 5:].to_numpy().astype(np.float64)
         # normalize

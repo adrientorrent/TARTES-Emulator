@@ -1,1 +1,27 @@
-TODO
+Modèle utilisé :
+
+    Input : Nombre de couches fixé à 50, et ajout d'une composante booléenne indiquant la présence de neige
+    Output : albedo broadband
+    + 1M paramètres entrainables
+    snowpack : convolutions + gmp + couches denses
+    sun : couches denses
+    snowpack + sun : couches denses
+    activations : ReLU puis Sigmoid
+
+Données utilisées :
+
+    Entrainement sur 1 seule année (Pyrénées 1982-1983)
+    1/2 epochs
+    Evaluation du modèle sur une année différente (Alpes 1983-1984)
+
+Performances :
+
+    Batch size : 128, 256 et 512
+    GPU Util : 85%
+    Temps pour 1 epoch : 10 à 12 minutes
+
+Résultats :
+
+    MSE évaluée sur les données de test :  0.00065 => RMSE = 0.025
+
+TODO : ajouter + de données et + d'epochs

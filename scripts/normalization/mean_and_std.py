@@ -92,8 +92,10 @@ def mean_and_std(
     pool = Pool(processes=10, maxtasksperchild=1)
     assert (len(files_paths) % 12) == 0, "Missing files"
     paths12 = [files_paths[i:i+12] for i in range(0, len(files_paths), 12)]
+    sub_var_dicts: list[dict]
     with pool:
         sub_var_dicts = pool.map(_sub_mean_and_std, paths12)
+    pool.close()
     for sub_var_dict in sub_var_dicts:
         for x in var_dict:
             var_dict[x]["sum"] += sub_var_dict[x]["sum"]
