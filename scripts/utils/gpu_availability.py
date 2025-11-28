@@ -2,10 +2,12 @@
 
 import torch
 
-print(torch.version.cuda)
+# print("cuda version:", torch.version.cuda)
 
+print("GPUs available:")
 for i in range(torch.cuda.device_count()):
-    print(i, torch.cuda.get_device_name(i))
+    print("-", i, torch.cuda.get_device_name(i))
 
 DEVICE = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
-print(f"{DEVICE} is a {torch.cuda.get_device_name(DEVICE.index)}")
+print(f"Current device index: {DEVICE.index}")
+print(f"Your GPU ({DEVICE}) is a {torch.cuda.get_device_name(DEVICE.index)}")

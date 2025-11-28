@@ -14,23 +14,18 @@ class TartesEmulator(nn.Module):
 
         self.conv1 = nn.Conv1d(in_channels=6, out_channels=32,
                                kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm1d(32)
 
         self.conv2 = nn.Conv1d(in_channels=32, out_channels=64,
                                kernel_size=5, padding=2)
-        self.bn2 = nn.BatchNorm1d(64)
 
         self.conv3 = nn.Conv1d(in_channels=64, out_channels=128,
                                kernel_size=3, padding=1)
-        self.bn3 = nn.BatchNorm1d(128)
 
         self.conv4 = nn.Conv1d(in_channels=128, out_channels=256,
                                kernel_size=5, padding=2)
-        self.bn4 = nn.BatchNorm1d(256)
 
         self.conv5 = nn.Conv1d(in_channels=256, out_channels=512,
                                kernel_size=3, padding=1)
-        self.bn5 = nn.BatchNorm1d(512)
 
         self.gmp = nn.AdaptiveMaxPool1d(1)
         self.flatten = nn.Flatten()
@@ -72,19 +67,14 @@ class TartesEmulator(nn.Module):
         """Snowpack forward function"""
 
         x_snowpack = self.conv1(x_snowpack)
-        x_snowpack = self.bn1(x_snowpack)
 
         x_snowpack = self.conv2(x_snowpack)
-        x_snowpack = self.bn2(x_snowpack)
 
         x_snowpack = self.conv3(x_snowpack)
-        x_snowpack = self.bn3(x_snowpack)
 
         x_snowpack = self.conv4(x_snowpack)
-        x_snowpack = self.bn4(x_snowpack)
 
         x_snowpack = self.conv5(x_snowpack)
-        x_snowpack = self.bn5(x_snowpack)
 
         x_snowpack = self.gmp(x_snowpack)
         x_snowpack = self.flatten(x_snowpack)

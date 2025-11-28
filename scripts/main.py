@@ -5,8 +5,8 @@ import time
 import logging
 
 import torch
-from torch.nn import MSELoss
-from torch.optim import Adam
+from torch.nn import MSELoss, HuberLoss
+from torch.optim import Adam, AdamW
 from torch.utils.data import DataLoader
 from torchmetrics import MeanSquaredError
 from torchinfo import summary
@@ -36,7 +36,7 @@ def main():
 
     # Files selection
     logger.debug("Data selection")
-    train_files, test_files, _ = train_test_split(train=15, test=5, seed=2025)
+    train_files, test_files, _ = train_test_split(train=1, test=1, seed=2025)
 
     # Normalization
     logger.debug("Computing normalization stats")
@@ -50,7 +50,7 @@ def main():
     # Dataloaders
     logger.debug("Creating dataloaders")
 
-    BATCH_SIZE = 512
+    BATCH_SIZE = 256
     NUM_WORKERS = 16
     PREFETCH_FACTOR = 32
     PIN_MEMORY = True
@@ -102,17 +102,22 @@ def main():
 
     # Loss, optimizer and metric
     logger.debug("Creating loss, optimizer and metric")
-    loss_fn = MSELoss()
-    optimizer = Adam(tartes_model.parameters())
-    metric = MeanSquaredError()
+    # mse_loss_fn = MSELoss()
+    huber_loss_fn = HuberLoss(delta=1e-3)
+    # adam_optimizer = Adam(tartes_model.parameters())
+    adamW_optimizer = AdamW(tartes_model.parameters())
+    mse_metric_fn = MeanSquaredError()
 
     # Device
-    DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+    # GPUs on sxbigdata1 : 0, 1 are NVIDIA A30 and 2 is a Tesla V100-PCIE-16GB
+    DEVICE = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     logger.info(f"The following experiments will be launched on {DEVICE}")
-    logger.info(f"{DEVICE} is a {torch.cuda.get_device_name(DEVICE.index)}")
+    logger.debug(
+        f"GPU {DEVICE.index} is a {torch.cuda.get_device_name(DEVICE.index)}"
+    )
 
     tartes_model = tartes_model.to(DEVICE)
-    metric = metric.to(DEVICE)
+    mse_metric_fn = mse_metric_fn.to(DEVICE)
 
     # Forward pass
     if logger.getEffectiveLevel() == logging.DEBUG:
@@ -134,15 +139,15 @@ def main():
 
     # Training
     logger.info("Start training")
-    epochs = 10
+    epochs = 3
     for ep in range(epochs):
         tartes_model = train(
             train_dataloader=train_dataloader,
             test_dataloader=test_dataloader,
             model=tartes_model,
-            loss_function=loss_fn,
-            optimizer=optimizer,
-            metric=metric,
+            loss_function=huber_loss_fn,
+            optimizer=adamW_optimizer,
+            metric_function=mse_metric_fn,
             device=DEVICE,
             epoch=ep,
             logger=logger

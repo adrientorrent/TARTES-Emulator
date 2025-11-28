@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+import sys
 import time
 import logging
 
 import torch
-from torch.nn import Module, MSELoss
+from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torchmetrics import MeanSquaredError
@@ -17,24 +18,26 @@ from tqdm import tqdm
 def evaluate(
     dataloader: DataLoader,
     model: Module,
-    loss_function: MSELoss,
-    metric: MeanSquaredError,
+    loss_function: Module,
+    metric_function: MeanSquaredError,
     device: torch.device,
     desc: str
 ) -> tuple[float, float]:
     '''
     Model evaluation
 
-    * Don't forget to move inputs model and metric to the device
+    * Don't forget to move inputs model and metric function to the device
     ** Model must be in evaluation mode
     '''
 
     # init
     running_loss, count = 0.0, 0
-    metric.reset()
+    metric_function.reset()
 
     # loop on batches
-    for X_snowpack, X_sun, y in tqdm(dataloader, desc=desc):
+    disable_tqdm = not sys.stdout.isatty()
+    for X_snowpack, X_sun, y in tqdm(dataloader, desc=desc,
+                                     disable=disable_tqdm):
         # move tensors to the device
         X_snowpack, X_sun = X_snowpack.to(device), X_sun.to(device)
         y = y.to(device)
@@ -47,23 +50,23 @@ def evaluate(
         running_loss += loss.item() * batch_size
         count += batch_size
         # update metric
-        metric.update(preds=y_hat, target=y)
+        metric_function.update(preds=y_hat, target=y)
 
     # mean loss
     mean_loss = running_loss / count
     # compute metric
-    mse = metric.compute().item()
+    metric = metric_function.compute().item()
 
-    return mean_loss, mse
+    return mean_loss, metric
 
 
 def train(
     train_dataloader: DataLoader,
     test_dataloader: DataLoader,
     model: Module,
-    loss_function: MSELoss,
+    loss_function: Module,
     optimizer: Optimizer,
-    metric: MeanSquaredError,
+    metric_function: MeanSquaredError,
     device: torch.device,
     epoch: int,
     logger: logging.Logger
@@ -71,7 +74,7 @@ def train(
     '''
     Model training over 1 epoch
 
-    * Don't forget to move inputs model and metric to the device
+    * Don't forget to move inputs model and metric function to the device
     '''
 
     start_time = time.time()
@@ -84,7 +87,9 @@ def train(
 
     # loop on batches
     running_loss, count = 0.0, 0
-    progress_bar = tqdm(train_dataloader, desc="Training")
+    disable_tqdm = not sys.stdout.isatty()
+    progress_bar = tqdm(train_dataloader, desc="Training",
+                        disable=disable_tqdm)
     for X_snowpack, X_sun, y in progress_bar:
         # move tensors to the device
         X_snowpack, X_sun = X_snowpack.to(device), X_sun.to(device)
@@ -103,7 +108,7 @@ def train(
         running_loss += loss.item() * batch_size
         count += batch_size
         # progress bar update
-        progress_bar.set_postfix({"mse": f"{running_loss / count}"})
+        progress_bar.set_postfix({"loss": f"{running_loss / count}"})
 
     # --- EVALUATION ---
     logger.info("Evaluation")
@@ -118,7 +123,7 @@ def train(
         #     dataloader=train_dataloader,
         #     model=model,
         #     loss_function=loss_function,
-        #     metric=metric,
+        #     metric_function=metric_function,
         #     device=device,
         #     desc="Evaluation on training data"
         # )
@@ -127,7 +132,7 @@ def train(
             dataloader=test_dataloader,
             model=model,
             loss_function=loss_function,
-            metric=metric,
+            metric_function=metric_function,
             device=device,
             desc="Evaluation on testing data"
         )
