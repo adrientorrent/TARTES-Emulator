@@ -82,7 +82,7 @@ def train(
     start_time = time.time()
 
     # --- LEARNING ---
-    logger.info("Learning")
+    logger.debug(f"Epoch {epoch} | Learning")
 
     # turn on training mode
     model.train()
@@ -117,7 +117,7 @@ def train(
     scheduler.step()
 
     # --- EVALUATION ---
-    logger.info("Evaluation")
+    logger.debug(f"Epoch {epoch} | Evaluation")
 
     # turn off training mode
     model.eval()

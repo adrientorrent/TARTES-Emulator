@@ -32,11 +32,9 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
-    logger.info("Gathering data")
-
     # Files selection
     logger.debug("Data selection")
-    train_files, test_files, _ = train_test_split(train=1, test=1, seed=2025)
+    train_files, test_files, _ = train_test_split(train=2, test=1, seed=2025)
 
     # Normalization
     logger.debug("Computing normalization stats")
@@ -90,7 +88,7 @@ def main():
             break
 
     # Model
-    logger.info("Model architecture")
+    logger.debug("Build model")
 
     tartes_model = TartesEmulator()
 
@@ -138,8 +136,8 @@ def main():
             break
 
     # Training
-    logger.info("Start training")
-    epochs = 5
+    epochs = 3
+    logger.debug(f"Training on {epochs} epochs")
     for ep in range(epochs):
         tartes_model = train(
             train_dataloader=train_dataloader,
