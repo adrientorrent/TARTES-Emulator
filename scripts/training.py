@@ -7,6 +7,7 @@ import logging
 import torch
 from torch.nn import Module
 from torch.optim import Optimizer
+from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
 from torchmetrics import MeanSquaredError
 from tqdm import tqdm
@@ -66,6 +67,7 @@ def train(
     model: Module,
     loss_function: Module,
     optimizer: Optimizer,
+    scheduler: LRScheduler,
     metric_function: MeanSquaredError,
     device: torch.device,
     epoch: int,
@@ -108,7 +110,11 @@ def train(
         running_loss += loss.item() * batch_size
         count += batch_size
         # progress bar update
-        progress_bar.set_postfix({"loss": f"{running_loss / count}"})
+        progress_bar.set_postfix({"loss": f"{running_loss / count}",
+                                  "lr": f"{scheduler.get_last_lr()[0]}"})
+
+    # Update Learning rate
+    scheduler.step()
 
     # --- EVALUATION ---
     logger.info("Evaluation")

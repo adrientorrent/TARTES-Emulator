@@ -5,8 +5,8 @@ import time
 import logging
 
 import torch
-from torch.nn import MSELoss, HuberLoss
-from torch.optim import Adam, AdamW
+from torch.nn import HuberLoss
+from torch.optim import AdamW, lr_scheduler
 from torch.utils.data import DataLoader
 from torchmetrics import MeanSquaredError
 from torchinfo import summary
@@ -100,13 +100,13 @@ def main():
         col_names=["kernel_size", "input_size", "output_size", "num_params"]
     )
 
-    # Loss, optimizer and metric
-    logger.debug("Creating loss, optimizer and metric")
-    # mse_loss_fn = MSELoss()
-    huber_loss_fn = HuberLoss(delta=1e-3)
-    # adam_optimizer = Adam(tartes_model.parameters())
-    adamW_optimizer = AdamW(tartes_model.parameters())
+    # Loss, metric, optimizer and scheduler
+    logger.debug("Learning setup")
+    huber_loss_fn = HuberLoss(delta=1e-4)
     mse_metric_fn = MeanSquaredError()
+    adamW_optimizer = AdamW(tartes_model.parameters(),
+                            lr=1e-3, weight_decay=1e-4)
+    explr_scheduler = lr_scheduler.ExponentialLR(adamW_optimizer, gamma=0.98)
 
     # Device
     # GPUs on sxbigdata1 : 0, 1 are NVIDIA A30 and 2 is a Tesla V100-PCIE-16GB
@@ -139,7 +139,7 @@ def main():
 
     # Training
     logger.info("Start training")
-    epochs = 3
+    epochs = 5
     for ep in range(epochs):
         tartes_model = train(
             train_dataloader=train_dataloader,
@@ -147,9 +147,10 @@ def main():
             model=tartes_model,
             loss_function=huber_loss_fn,
             optimizer=adamW_optimizer,
+            scheduler=explr_scheduler,
             metric_function=mse_metric_fn,
             device=DEVICE,
-            epoch=ep,
+            epoch=ep + 1,
             logger=logger
         )
 
