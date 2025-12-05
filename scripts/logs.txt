@@ -1,0 +1,226 @@
+[I 2025-12-04 19:04:53,321] A new study created in RDB with name: TARTES
+[I 2025-12-04 20:10:10,146] Trial 1 finished with value: 0.0019015221623703837 and parameters: {'batch_size': 256, 'n_layers': 10, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 500, 'layer_4_size': 10, 'layer_5_size': 10, 'layer_6_size': 1000, 'layer_7_size': 500, 'layer_8_size': 50, 'layer_9_size': 50, 'layer_10_size': 1000, 'learning_rate': 1.93431502348304e-05}. Best is trial 1 with value: 0.0019015221623703837.
+[I 2025-12-04 22:26:50,041] Trial 0 finished with value: 0.0023342519998550415 and parameters: {'batch_size': 64, 'n_layers': 11, 'layer_1_size': 100, 'layer_2_size': 100, 'layer_3_size': 1000, 'layer_4_size': 1000, 'layer_5_size': 500, 'layer_6_size': 100, 'layer_7_size': 100, 'layer_8_size': 10, 'layer_9_size': 100, 'layer_10_size': 50, 'layer_11_size': 10, 'learning_rate': 6.0519824831928224e-05}. Best is trial 1 with value: 0.0019015221623703837.
+[I 2025-12-04 23:07:29,009] Trial 2 finished with value: 0.016254037618637085 and parameters: {'batch_size': 64, 'n_layers': 15, 'layer_1_size': 500, 'layer_2_size': 50, 'layer_3_size': 10, 'layer_4_size': 10, 'layer_5_size': 100, 'layer_6_size': 50, 'layer_7_size': 50, 'layer_8_size': 1000, 'layer_9_size': 10, 'layer_10_size': 500, 'layer_11_size': 1000, 'layer_12_size': 100, 'layer_13_size': 1000, 'layer_14_size': 10, 'layer_15_size': 10, 'learning_rate': 0.00017333938442783684}. Best is trial 1 with value: 0.0019015221623703837.
+[I 2025-12-05 00:44:59,715] Trial 6 finished with value: 0.002529843943193555 and parameters: {'batch_size': 128, 'n_layers': 8, 'layer_1_size': 10, 'layer_2_size': 100, 'layer_3_size': 100, 'layer_4_size': 100, 'layer_5_size': 50, 'layer_6_size': 1000, 'layer_7_size': 50, 'layer_8_size': 100, 'learning_rate': 0.0002918754057342784}. Best is trial 1 with value: 0.0019015221623703837.
+[I 2025-12-05 00:51:37,921] Trial 4 finished with value: 0.01624172367155552 and parameters: {'batch_size': 64, 'n_layers': 15, 'layer_1_size': 1000, 'layer_2_size': 50, 'layer_3_size': 1000, 'layer_4_size': 100, 'layer_5_size': 50, 'layer_6_size': 100, 'layer_7_size': 50, 'layer_8_size': 50, 'layer_9_size': 1000, 'layer_10_size': 1000, 'layer_11_size': 500, 'layer_12_size': 500, 'layer_13_size': 500, 'layer_14_size': 1000, 'layer_15_size': 50, 'learning_rate': 0.0005055768522399977}. Best is trial 1 with value: 0.0019015221623703837.
+[I 2025-12-05 01:36:38,214] Trial 3 pruned. 
+[I 2025-12-05 02:02:35,993] Trial 8 pruned. 
+[I 2025-12-05 02:18:59,680] Trial 5 pruned. 
+[I 2025-12-05 02:27:36,713] Trial 7 pruned. 
+[I 2025-12-05 03:29:46,343] Trial 12 pruned. 
+[I 2025-12-05 04:20:09,354] Trial 9 pruned. 
+[I 2025-12-05 04:37:47,750] Trial 14 pruned. 
+[I 2025-12-05 05:06:39,533] Trial 15 finished with value: 0.0013156515778973699 and parameters: {'batch_size': 256, 'n_layers': 11, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 1000, 'layer_4_size': 1000, 'layer_5_size': 500, 'layer_6_size': 1000, 'layer_7_size': 500, 'layer_8_size': 10, 'layer_9_size': 100, 'layer_10_size': 50, 'layer_11_size': 100, 'learning_rate': 2.361289377953511e-05}. Best is trial 15 with value: 0.0013156515778973699.
+[I 2025-12-05 05:24:44,220] Trial 16 pruned. 
+[I 2025-12-05 05:53:31,508] Trial 17 finished with value: 0.0013294558739289641 and parameters: {'batch_size': 256, 'n_layers': 10, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 500, 'layer_4_size': 50, 'layer_5_size': 100, 'layer_6_size': 1000, 'layer_7_size': 500, 'layer_8_size': 500, 'layer_9_size': 50, 'layer_10_size': 1000, 'learning_rate': 4.891569890975867e-05}. Best is trial 15 with value: 0.0013156515778973699.
+[I 2025-12-05 06:24:09,530] Trial 18 finished with value: 0.0014310515252873302 and parameters: {'batch_size': 256, 'n_layers': 13, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 1000, 'layer_4_size': 50, 'layer_5_size': 100, 'layer_6_size': 1000, 'layer_7_size': 500, 'layer_8_size': 500, 'layer_9_size': 100, 'layer_10_size': 50, 'layer_11_size': 100, 'layer_12_size': 500, 'layer_13_size': 50, 'learning_rate': 3.9673552052660067e-05}. Best is trial 15 with value: 0.0013156515778973699.
+[I 2025-12-05 06:49:22,620] Trial 19 finished with value: 0.0012661146465688944 and parameters: {'batch_size': 256, 'n_layers': 6, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 500, 'layer_4_size': 50, 'layer_5_size': 100, 'layer_6_size': 500, 'learning_rate': 4.395372676826275e-05}. Best is trial 19 with value: 0.0012661146465688944.
+[I 2025-12-05 07:13:44,092] Trial 20 finished with value: 0.0015240419888868928 and parameters: {'batch_size': 256, 'n_layers': 5, 'layer_1_size': 1000, 'layer_2_size': 10, 'layer_3_size': 1000, 'layer_4_size': 1000, 'layer_5_size': 100, 'learning_rate': 2.635806114854131e-05}. Best is trial 19 with value: 0.0012661146465688944.
+[I 2025-12-05 07:40:13,123] Trial 21 finished with value: 0.0010986257111653686 and parameters: {'batch_size': 256, 'n_layers': 7, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 50, 'layer_4_size': 50, 'layer_5_size': 500, 'layer_6_size': 500, 'layer_7_size': 1000, 'learning_rate': 1.00788952123819e-05}. Best is trial 21 with value: 0.0010986257111653686.
+[I 2025-12-05 07:55:26,792] Trial 22 pruned. 
+[I 2025-12-05 08:19:52,983] Trial 23 pruned. 
+[I 2025-12-05 08:45:54,781] Trial 24 finished with value: 0.0016222328413277864 and parameters: {'batch_size': 256, 'n_layers': 7, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 50, 'layer_4_size': 50, 'layer_5_size': 500, 'layer_6_size': 500, 'layer_7_size': 1000, 'learning_rate': 3.1174132123604934e-05}. Best is trial 21 with value: 0.0010986257111653686.
+[I 2025-12-05 09:00:51,774] Trial 25 pruned. 
+[I 2025-12-05 09:17:00,065] Trial 26 pruned. 
+[I 2025-12-05 09:32:25,921] Trial 27 pruned. 
+[I 2025-12-05 09:59:17,293] Trial 28 finished with value: 0.0014619887806475163 and parameters: {'batch_size': 256, 'n_layers': 8, 'layer_1_size': 500, 'layer_2_size': 500, 'layer_3_size': 1000, 'layer_4_size': 500, 'layer_5_size': 1000, 'layer_6_size': 500, 'layer_7_size': 1000, 'layer_8_size': 10, 'learning_rate': 4.0330186646648524e-05}. Best is trial 21 with value: 0.0010986257111653686.
+[I 2025-12-05 10:16:08,795] Trial 29 pruned. 
+[I 2025-12-05 10:32:45,454] Trial 30 pruned. 
+[W 2025-12-05 11:56:54,153] Trial 31 failed with parameters: {'batch_size': 32, 'n_layers': 5, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 1000, 'layer_4_size': 50, 'layer_5_size': 500, 'learning_rate': 2.4251286890857406e-05} because of the following error: FileNotFoundError(2, 'No such file or directory').
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+  File "/home/torrenta/TARTES-Emulator/scripts/finetuning.py", line 98, in objective
+    model = train(
+        train_dataloader=train_dataloader,
+    ...<4 lines>...
+        device=device
+    )
+  File "/home/torrenta/TARTES-Emulator/scripts/training.py", line 39, in train
+    for X_snowpack, X_sun, y in progress_bar:
+                                ^^^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/tqdm/std.py", line 1169, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1448, in _next_data
+    idx, data = self._get_data()
+                ~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1412, in _get_data
+    success, data = self._try_get_data()
+                    ~~~~~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1243, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/queues.py", line 120, in get
+    return _ForkingPickler.loads(res)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/multiprocessing/reductions.py", line 541, in rebuild_storage_fd
+    fd = df.detach()
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/resource_sharer.py", line 57, in detach
+    with _resource_sharer.get_connection(self._id) as conn:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/resource_sharer.py", line 86, in get_connection
+    c = Client(address, authkey=process.current_process().authkey)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/connection.py", line 519, in Client
+    c = SocketClient(address)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/connection.py", line 647, in SocketClient
+    s.connect(address)
+    ~~~~~~~~~^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+[W 2025-12-05 11:56:54,275] Trial 31 failed with value None.
+[W 2025-12-05 11:56:55,217] Trial 10 failed with parameters: {'batch_size': 64, 'n_layers': 14, 'layer_1_size': 50, 'layer_2_size': 100, 'layer_3_size': 500, 'layer_4_size': 50, 'layer_5_size': 10, 'layer_6_size': 50, 'layer_7_size': 50, 'layer_8_size': 1000, 'layer_9_size': 500, 'layer_10_size': 500, 'layer_11_size': 50, 'layer_12_size': 100, 'layer_13_size': 100, 'layer_14_size': 1000, 'learning_rate': 3.0968182963533205e-05} because of the following error: RuntimeError('DataLoader worker (pid(s) 43975, 44115, 44257) exited unexpectedly').
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1243, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/queues.py", line 112, in get
+    raise Empty
+_queue.Empty
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+  File "/home/torrenta/TARTES-Emulator/scripts/finetuning.py", line 98, in objective
+    model = train(
+        train_dataloader=train_dataloader,
+    ...<4 lines>...
+        device=device
+    )
+  File "/home/torrenta/TARTES-Emulator/scripts/training.py", line 39, in train
+    for X_snowpack, X_sun, y in progress_bar:
+                                ^^^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/tqdm/std.py", line 1169, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1448, in _next_data
+    idx, data = self._get_data()
+                ~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1412, in _get_data
+    success, data = self._try_get_data()
+                    ~~~~~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1256, in _try_get_data
+    raise RuntimeError(
+        f"DataLoader worker (pid(s) {pids_str}) exited unexpectedly"
+    ) from e
+RuntimeError: DataLoader worker (pid(s) 43975, 44115, 44257) exited unexpectedly
+[W 2025-12-05 11:56:55,220] Trial 10 failed with value None.
+[W 2025-12-05 11:56:56,347] Trial 11 failed with parameters: {'batch_size': 256, 'n_layers': 14, 'layer_1_size': 10, 'layer_2_size': 500, 'layer_3_size': 500, 'layer_4_size': 500, 'layer_5_size': 10, 'layer_6_size': 500, 'layer_7_size': 50, 'layer_8_size': 1000, 'layer_9_size': 500, 'layer_10_size': 500, 'layer_11_size': 1000, 'layer_12_size': 10, 'layer_13_size': 500, 'layer_14_size': 500, 'learning_rate': 7.635830093404944e-05} because of the following error: RuntimeError('DataLoader worker (pid(s) 6070, 6243, 6335) exited unexpectedly').
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1243, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/queues.py", line 112, in get
+    raise Empty
+_queue.Empty
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+  File "/home/torrenta/TARTES-Emulator/scripts/finetuning.py", line 98, in objective
+    model = train(
+        train_dataloader=train_dataloader,
+    ...<4 lines>...
+        device=device
+    )
+  File "/home/torrenta/TARTES-Emulator/scripts/training.py", line 39, in train
+    for X_snowpack, X_sun, y in progress_bar:
+                                ^^^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/tqdm/std.py", line 1169, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1448, in _next_data
+    idx, data = self._get_data()
+                ~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1412, in _get_data
+    success, data = self._try_get_data()
+                    ~~~~~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1256, in _try_get_data
+    raise RuntimeError(
+        f"DataLoader worker (pid(s) {pids_str}) exited unexpectedly"
+    ) from e
+RuntimeError: DataLoader worker (pid(s) 6070, 6243, 6335) exited unexpectedly
+[W 2025-12-05 11:56:56,350] Trial 11 failed with value None.
+[W 2025-12-05 11:56:59,283] Trial 13 failed with parameters: {'batch_size': 256, 'n_layers': 13, 'layer_1_size': 1000, 'layer_2_size': 500, 'layer_3_size': 500, 'layer_4_size': 10, 'layer_5_size': 10, 'layer_6_size': 500, 'layer_7_size': 500, 'layer_8_size': 50, 'layer_9_size': 50, 'layer_10_size': 1000, 'layer_11_size': 100, 'layer_12_size': 10, 'layer_13_size': 10, 'learning_rate': 1.0904714906638579e-05} because of the following error: RuntimeError('DataLoader worker (pid(s) 25762, 25824, 25878) exited unexpectedly').
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1243, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/queues.py", line 112, in get
+    raise Empty
+_queue.Empty
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+  File "/home/torrenta/TARTES-Emulator/scripts/finetuning.py", line 98, in objective
+    model = train(
+        train_dataloader=train_dataloader,
+    ...<4 lines>...
+        device=device
+    )
+  File "/home/torrenta/TARTES-Emulator/scripts/training.py", line 39, in train
+    for X_snowpack, X_sun, y in progress_bar:
+                                ^^^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/tqdm/std.py", line 1169, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1448, in _next_data
+    idx, data = self._get_data()
+                ~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1412, in _get_data
+    success, data = self._try_get_data()
+                    ~~~~~~~~~~~~~~~~~~^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/torch/utils/data/dataloader.py", line 1256, in _try_get_data
+    raise RuntimeError(
+        f"DataLoader worker (pid(s) {pids_str}) exited unexpectedly"
+    ) from e
+RuntimeError: DataLoader worker (pid(s) 25762, 25824, 25878) exited unexpectedly
+[W 2025-12-05 11:56:59,286] Trial 13 failed with value None.
+Traceback (most recent call last):
+  File "/home/torrenta/TARTES-Emulator/scripts/finetuning.py", line 132, in <module>
+    study.optimize(objective, n_trials=150, n_jobs=4)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+    ~~~~~~~~~^
+        study=self,
+        ^^^^^^^^^^^
+    ...<7 lines>...
+        show_progress_bar=show_progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/site-packages/optuna/study/_optimize.py", line 101, in _optimize
+    completed, futures = wait(futures, return_when=FIRST_COMPLETED)
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/concurrent/futures/_base.py", line 305, in wait
+    waiter.event.wait(timeout)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/threading.py", line 659, in wait
+    signaled = self._cond.wait(timeout)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/threading.py", line 359, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+KeyboardInterrupt
+Exception ignored in atexit callback <function _exit_function at 0x7fe6d79139c0>:
+Traceback (most recent call last):
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/util.py", line 424, in _exit_function
+    p.join()
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/process.py", line 149, in join
+    res = self._popen.wait(timeout)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/popen_fork.py", line 44, in wait
+    return self.poll(os.WNOHANG if timeout == 0.0 else 0)
+  File "/bigdata/BIGDATA/torrenta/conda_envs/envA/lib/python3.13/multiprocessing/popen_fork.py", line 28, in poll
+    pid, sts = os.waitpid(self.pid, flag)
+KeyboardInterrupt: 
