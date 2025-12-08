@@ -40,14 +40,6 @@ class MLPTartesEmulator(nn.Module):
             nn.Sigmoid()
         )
 
-        self.flatten = nn.Flatten()
-
-    def forward(self, x_snowpack: torch.Tensor, x_sun: torch.Tensor):
+    def forward(self, x: torch.Tensor):
         """Forward function"""
-
-        x_snowpack = self.flatten(x_snowpack)
-        x = torch.cat((x_snowpack, x_sun), dim=1)
-
-        x = self.net(x)
-
-        return x
+        return self.net(x)

@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+
+import sys
+import time
+import logging
+
+import torch
+from torch.nn import MSELoss
+from torch.optim import Adam, lr_scheduler
+from torch.utils.data import DataLoader
+from torchmetrics import MeanSquaredError
+from torchinfo import summary
+
+from utils.data_selection import train_test_split, print_selection
+from normalization.mean_and_std import trigger_mean_and_std
+from normalization.new_normalize import CustomNorm
+from new_dataset import NewTartesDataset
+from mlp_model import MLPTartesEmulator
+from new_training import train, evaluate
+
+
+def main():
+    """Description"""
+
+    t0 = time.time()
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
+    # Files selection
+    logger.debug("Data selection")
+    train_files, test_files, _ = train_test_split(train=2, test=1, seed=2025)
+
+    print("=" * 115)
+    print("Train dataset:")
+    print_selection(files=train_files)
+    print("Test dataset:")
+    print_selection(files=test_files)
+
+    # Normalization
+    logger.debug("Computing normalization stats")
+    data_dir = "/home/torrenta/TARTES-Emulator/data"
+    mean_and_std_path = f"{data_dir}/normalization/mean_and_std_212025.parquet"
+    trigger_mean_and_std(
+        files_paths=train_files,
+        out_path=mean_and_std_path,
+        logger=logger
+    )
+    custom_norm = CustomNorm(mean_and_std_path)
+
+    # Datasets
+    logger.debug("Creating datasets")
+    train_dataset = NewTartesDataset(files=train_files, norm=custom_norm)
+    test_dataset = NewTartesDataset(files=test_files, norm=custom_norm)
+
+    # Dataloaders
+    logger.debug("Creating dataloaders")
+
+    BATCH_SIZE = 256
+    NUM_WORKERS = 16
+    PREFETCH_FACTOR = 32
+    PIN_MEMORY = True
+    PERSISTENT_WORKERS = True
+    DROP_LAST = False
+
+    train_dataloader = DataLoader(
+        dataset=train_dataset,
+        sampler=torch.utils.data.SequentialSampler(train_dataset),
+        batch_size=BATCH_SIZE,
+        num_workers=NUM_WORKERS,
+        pin_memory=PIN_MEMORY,
+        prefetch_factor=PREFETCH_FACTOR,
+        persistent_workers=PERSISTENT_WORKERS,
+        drop_last=DROP_LAST
+    )
+    test_dataloader = DataLoader(
+        dataset=test_dataset,
+        sampler=torch.utils.data.SequentialSampler(test_dataset),
+        batch_size=BATCH_SIZE,
+        num_workers=NUM_WORKERS,
+        pin_memory=PIN_MEMORY,
+        prefetch_factor=PREFETCH_FACTOR,
+        persistent_workers=PERSISTENT_WORKERS,
+        drop_last=DROP_LAST
+    )
+
+    print("=" * 115)
+    print(f"Batch size: {BATCH_SIZE}")
+    print(f"Workers: {NUM_WORKERS}")
+    print(f"Drop last: {DROP_LAST}")
+
+    # 1st batch shapes
+    if logger.getEffectiveLevel() == logging.DEBUG:
+        for X, y in train_dataloader:
+            logger.debug("--- BATCH INFOS | SHAPES ---")
+            logger.debug(f"X: {X.shape}")
+            logger.debug(f"y: {y.shape}")
+            break
+
+    # Model
+    logger.debug("Build model")
+    mlp_model = MLPTartesEmulator()
+    summary(
+        mlp_model,
+        input_size=[(1, 303)],
+        col_names=["input_size", "output_size", "num_params"]
+    )
+
+    # Loss, metric, optimizer and scheduler
+    logger.debug("Loss and metric")
+    mse_loss_fn = MSELoss()
+    print("Loss: MSELoss")
+    mse_metric_fn = MeanSquaredError()
+    print("Metric: MeanSquaredError")
+    adam_optimizer = Adam(mlp_model.parameters(), lr=1e-3, weight_decay=1e-4)
+    print("Opimizer: Adam(lr=1e-3, weight_decay=1e-4)")
+    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.98)
+    print("Scheduler: ExponentialLR(gamma=0.98)")
+    print("=" * 115)
+
+    # Device
+    # GPUs on sxbigdata1 : 0, 1 are NVIDIA A30 and 2 is a Tesla V100-PCIE-16GB
+    DEVICE = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+    mlp_model = mlp_model.to(DEVICE)
+    mse_metric_fn = mse_metric_fn.to(DEVICE)
+    print(f"The following experiments will be launched on {DEVICE}")
+    logger.debug(
+        f"GPU {DEVICE.index} is a {torch.cuda.get_device_name(DEVICE.index)}"
+    )
+    print("-" * 115)
+
+    # Forward pass
+    if logger.getEffectiveLevel() == logging.DEBUG:
+        for X, y in train_dataloader:
+            X = X.to(DEVICE)
+            y_hat = mlp_model(X)
+            logger.debug("--- FORWARD PASS | SHAPES ---")
+            logger.debug(f"TARTES ALBEDO: {y.shape}")
+            logger.debug(f"MODEL PREDICTION: {y_hat.shape}")
+            logger.debug("--- FORWARD PASS | INFERENCE ---")
+            logger.debug(f"TARTES ALBEDO: {y[0][0]}")
+            logger.debug(f"MODEL PREDICTION: {y_hat[0][0]}")
+            break
+
+    # Training loop
+    epochs = 3
+    logger.debug(f"Training on {epochs} epochs")
+    for ep in range(epochs):
+
+        print(f"EPOCH {ep + 1}/{epochs}")
+
+        start_time = time.time()
+
+        # Training
+        mlp_model = train(
+            train_dataloader=train_dataloader,
+            model=mlp_model,
+            loss_function=mse_loss_fn,
+            optimizer=adam_optimizer,
+            scheduler=explr_scheduler,
+            device=DEVICE
+        )
+
+        # Evaluation based on testing data
+        test_loss, test_metric = evaluate(
+            dataloader=test_dataloader,
+            model=mlp_model,
+            loss_function=mse_loss_fn,
+            metric_function=mse_metric_fn,
+            device=DEVICE,
+            desc="Evaluation"
+        )
+
+        # Results
+        elapsed_time = time.time() - start_time
+        print(f"Elapsed Time : {elapsed_time:.2f} s")
+        print(f"[TEST] Loss: {test_loss}")
+        print(f"[TEST] Metric: {test_metric}")
+
+        print("-" * 115)
+
+    # Save model parameters (save full model ?)
+    if logger.getEffectiveLevel() == logging.INFO:
+        PATH = "/home/torrenta/TARTES-Emulator/data/model/mlp-tartes-model.pt"
+        torch.save(mlp_model.state_dict(), PATH)
+        print(f"Model save in {PATH}")
+
+    t1 = time.time()
+    print(f"Run time: {(t1 - t0):.2f} seconds")
+
+    return
+
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)

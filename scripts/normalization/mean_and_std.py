@@ -16,22 +16,14 @@ General description
 """
 
 
-# --- useful paths ---
-
-OUT_DIR = "/home/torrenta/TARTES-Emulator/data/normalization"
-OUT_PATH = OUT_DIR + "/mean_and_std.parquet"
-
-
-# --- compute mean and std ---
-
 def _sub_mean_and_std(paths: list[str]):
     """Description"""
 
     # build output
     snowpack = ["dz", "ssa", "density", "conc_soot", "conc_dust"]
-    shortwaves = ["direct_sw", "diffuse_sw"]
+    sun = ["direct_sw", "diffuse_sw", "cos_sza", "albedo"]
     sub_var_dict = {}
-    for x in snowpack + shortwaves:
+    for x in snowpack + sun:
         sub_var_dict[x] = {"count": 0, "sum": 0, "sum2": 0}
 
     # read 12 files on by one
@@ -56,7 +48,7 @@ def _sub_mean_and_std(paths: list[str]):
                 sub_var_dict[x]["count"] += polars_count.item()
 
         # shortwaves
-        for x in shortwaves:
+        for x in sun:
 
             polars_sum = polars_df.select(pl.sum(x))
             sub_var_dict[x]["sum"] += polars_sum.item()
@@ -75,6 +67,7 @@ def _sub_mean_and_std(paths: list[str]):
 
 def mean_and_std(
         files_paths: list[str],
+        out_path: str,
         logger: logging.Logger
 ) -> None:
     """Description"""
@@ -82,9 +75,9 @@ def mean_and_std(
     # initialize variables
     logger.debug("Inititialize dict of useful variables")
     snowpack = ["dz", "ssa", "density", "conc_soot", "conc_dust"]
-    shortwaves = ["direct_sw", "diffuse_sw"]
+    sun = ["direct_sw", "diffuse_sw", "cos_sza", "albedo"]
     var_dict = {}
-    for x in snowpack + shortwaves:
+    for x in snowpack + sun:
         var_dict[x] = {"count": 0, "sum": 0, "mean": 0, "sum2": 0, "std": 0}
 
     # parallel processing
@@ -117,10 +110,10 @@ def mean_and_std(
     # build dataframe
     logger.debug("Building dataframe")
     df_out = pd.DataFrame(np.array([
-        [var_dict[x]["mean"] for x in snowpack + shortwaves],
-        [var_dict[x]["std"] for x in snowpack + shortwaves]
+        [var_dict[x]["mean"] for x in snowpack + sun],
+        [var_dict[x]["std"] for x in snowpack + sun]
     ]))
-    df_out.columns = snowpack + shortwaves
+    df_out.columns = snowpack + sun
     df_out.index = pd.Index(["mean", "std"])
 
     # add meta data
@@ -129,25 +122,26 @@ def mean_and_std(
     df_out.attrs["files"] = files_paths
 
     # save into a parquet file
-    logger.debug(f"Saving results in {OUT_PATH}")
-    df_out.to_parquet(OUT_PATH)
+    logger.debug(f"Saving results in {out_path}")
+    df_out.to_parquet(out_path)
     return
 
 
 def trigger_mean_and_std(
         files_paths: list[str],
+        out_path: str,
         logger: logging.Logger
 ) -> None:
     """Description"""
 
-    if not exists(OUT_PATH):
+    if not exists(out_path):
         logger.debug("No previous data")
-        mean_and_std(files_paths=files_paths, logger=logger)
+        mean_and_std(files_paths=files_paths, out_path=out_path, logger=logger)
         return
 
     # get previous files paths
     logger.debug("Reading previous training files paths")
-    df = pd.read_parquet(OUT_PATH)
+    df = pd.read_parquet(out_path)
     prev_files_paths = df.attrs["files"]
     del df
 
@@ -155,6 +149,6 @@ def trigger_mean_and_std(
     logger.debug("Checking if there are differents")
     if set(files_paths) != set(prev_files_paths):
         logger.debug("There are: lauching mean_and_std function")
-        mean_and_std(files_paths=files_paths, logger=logger)
+        mean_and_std(files_paths=files_paths, out_path=out_path, logger=logger)
 
     return

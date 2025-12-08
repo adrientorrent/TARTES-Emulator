@@ -107,6 +107,7 @@ def preprocess_function(forcing_path: str, pro_path: str,
     logger.debug("Gathering snow data")
     for i in range(50):
         DS_TEMP = PRO.sel(snow_layer=i)
+        samples[f"snow_layer{i+1}"] = ~np.isnan(DS_TEMP["SNOWDZ"].values)
         samples[f"dz{i+1}"] = DS_TEMP["SNOWDZ"].values
         samples[f"ssa{i+1}"] = DS_TEMP["SNOWSSA"].values
         samples[f"density{i+1}"] = DS_TEMP["RSN_VEG"].values
@@ -128,16 +129,13 @@ def preprocess_function(forcing_path: str, pro_path: str,
     logger.debug("Building pandas dataframe")
     df = pd.DataFrame(samples)
     # sort columns
-    snow_var = ["dz", "ssa", "density", "conc_soot", "conc_dust"]
+    snow_var = ["snow_layer", "dz", "ssa", "density", "conc_soot", "conc_dust"]
     snow_col = [f"{k}{i + 1}" for k in snow_var for i in range(50)]
     sun_col = ["direct_sw", "diffuse_sw", "cos_sza"]
     albedo_col = ["albedo"]
     id_col = ["time", "ZS", "aspect", "slope", "massif_number"]
     col = id_col + snow_col + sun_col + albedo_col
     df = df[col]
-
-    # shuffle data (disrupt day cycle)
-    df = df.sample(axis='index', frac=1).reset_index(drop=True)
 
     # add metadata
     logger.debug("Adding metadata")
@@ -150,6 +148,7 @@ def preprocess_function(forcing_path: str, pro_path: str,
         "massif_number": "massif number"
     }
     df.attrs["variables"] = {
+        "snow_layer": "snow layer existence (bool)",
         "dz": "snow layer thickness (m)",
         "ssa": "snow layer specific surface area (m2 kg-1)",
         "density": "snow density (kg/m3)",
@@ -178,7 +177,7 @@ def preprocess_function(forcing_path: str, pro_path: str,
 
     # write parquet
     logger.debug("Writing parquet")
-    df.to_parquet(out_path)
+    df.to_parquet(out_path, engine="pyarrow", row_group_size=50000)
 
     # clean memory
     del FORCING

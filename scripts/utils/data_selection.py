@@ -261,3 +261,15 @@ def train_test_split(
 
         case _, _, _:
             raise Exception("Args train, test, val must be of the same type")
+
+
+def print_selection(files: pathslist) -> None:
+    already_printed = []
+    for file_path in files:
+        geo = "Alpes" if "Alpes" in file_path else "Pyrénées"
+        y1 = file_path.split("_")[1]
+        y2 = file_path.split("_")[2][:4]
+        txt = f" - {geo} {y1} {y2}"
+        if txt not in already_printed:
+            print(txt)
+            already_printed.append(txt)
