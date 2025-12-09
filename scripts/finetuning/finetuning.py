@@ -15,7 +15,8 @@ import optuna
 
 from utils.data_selection import train_test_split
 from normalization.mean_and_std import trigger_mean_and_std
-from dataset import TartesDataset
+from normalization.normalize import CustomNorm2
+from dataset import MlpTartesIterableDataset
 from training import train, evaluate
 
 
@@ -26,18 +27,19 @@ logging.basicConfig(
 )
 
 
-train_files, _, _ = train_test_split(train=1, test=1, seed=212)
-trigger_mean_and_std(files_paths=train_files, logger=logger)
-train_dataset = TartesDataset(files_paths=train_files)
+train_files, _, _ = train_test_split(train=1, test=1, seed=1209)
+data_dir = "/home/torrenta/TARTES-Emulator/data"
+mean_and_std_path = f"{data_dir}/normalization/mean_and_std_111209.parquet"
+trigger_mean_and_std(files_paths=train_files, out_path=mean_and_std_path,
+                     logger=logger)
+custom_norm = CustomNorm2(mean_and_std_path)
+train_dataset = MlpTartesIterableDataset(files=train_files, norm=custom_norm)
 
 
 class OptunaTartesEmulator(nn.Module):
 
     def __init__(self, layer_sizes):
         super().__init__()
-
-        self.flatten = nn.Flatten()
-
         fc_layers = []
         prev_size = 300 + 3
         for size in layer_sizes:
@@ -49,25 +51,22 @@ class OptunaTartesEmulator(nn.Module):
         fc_layers.append(nn.Sigmoid())
         self.fc_net = nn.Sequential(*fc_layers)
 
-    def forward(self, x_snowpack: torch.Tensor, x_sun: torch.Tensor):
+    def forward(self, x: torch.Tensor):
         """Forward function"""
-        x_snowpack = self.flatten(x_snowpack)
-        x = torch.cat((x_snowpack, x_sun), dim=1)
-        x = self.fc_net(x)
-        return x
+        return self.fc_net(x)
 
 
 def objective(trial: optuna.trial.Trial):
-    """"Description"""
+    """"Do 1 Trial"""
 
+    # output
     metric = 0.
 
-    batch_size = trial.suggest_categorical("batch_size", [32, 64, 128, 256])
     train_dataloader = DataLoader(
         dataset=train_dataset,
-        batch_size=batch_size,
-        num_workers=4,
-        prefetch_factor=16,
+        batch_size=512,
+        num_workers=16,
+        prefetch_factor=64,
         drop_last=False,
         pin_memory=False,
         persistent_workers=False
@@ -78,7 +77,7 @@ def objective(trial: optuna.trial.Trial):
     for i in range(n_layers):
         size = trial.suggest_categorical(
             f"layer_{i+1}_size",
-            [10, 50, 100, 500, 1000]
+            [10, 50, 100, 300, 500, 1000]
         )
         layer_sizes.append(size)
     model = OptunaTartesEmulator(layer_sizes=layer_sizes)
@@ -88,19 +87,21 @@ def objective(trial: optuna.trial.Trial):
     lr = trial.suggest_float("learning_rate", 1e-5, 1e-3, log=True)
     adam_optimizer = Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.98)
+    scaler = torch.GradScaler()
 
     device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     model.to(device)
     mse_metric_fn = mse_metric_fn.to(device)
 
-    epochs = 5
-    for ep in range(epochs):
+    epochs = 3
+    for _ in range(epochs):
         model = train(
             train_dataloader=train_dataloader,
             model=model,
             loss_function=mse_loss_fn,
             optimizer=adam_optimizer,
             scheduler=explr_scheduler,
+            scaler=scaler,
             device=device
         )
         _, metric = evaluate(
@@ -111,9 +112,6 @@ def objective(trial: optuna.trial.Trial):
             device=device,
             desc="Evaluation"
         )
-        trial.report(metric, step=ep)
-        if trial.should_prune():
-            raise optuna.exceptions.TrialPruned()
 
     return metric
 
@@ -122,14 +120,14 @@ if __name__ == "__main__":
 
     t0 = time.time()
 
+    study_path = "/home/torrenta/TARTES-Emulator/scripts/finetuning/study.db"
     study = optuna.create_study(
         direction="minimize",
-        pruner=optuna.pruners.MedianPruner(n_warmup_steps=2),
         study_name="TARTES",
-        storage="sqlite:///TARTES.db",
+        storage=f"sqlite:///{study_path}",
         load_if_exists=True
     )
-    # study.optimize(objective, n_trials=150, n_jobs=4)
+    study.optimize(objective, n_trials=50)
     print(study.best_params, study.best_value)
 
     t1 = time.time()

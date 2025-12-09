@@ -11,7 +11,7 @@ from torchmetrics import Metric
 from tqdm import tqdm
 
 
-"""General description"""
+"""Training and evaluation loops"""
 
 
 def train(
@@ -20,12 +20,13 @@ def train(
     loss_function: Module,
     optimizer: Optimizer,
     scheduler: LRScheduler,
+    scaler: torch.GradScaler,
     device: torch.device
 ) -> Module:
     '''
     Model training over 1 epoch
 
-    * Don't forget to move inputs model to the device
+    * Don't forget to move the model to the device
     '''
 
     # turn on training mode
@@ -36,21 +37,25 @@ def train(
     disable_tqdm = not sys.stdout.isatty()
     desc = "Training"
     progress_bar = tqdm(train_dataloader, desc=desc, disable=disable_tqdm)
-    for X_snowpack, X_sun, y in progress_bar:
+    for X, y in progress_bar:
         # move tensors to the device
-        X_snowpack, X_sun = X_snowpack.to(device), X_sun.to(device)
+        X = X.to(device)
         y = y.to(device)
-        # predict
-        y_hat = model(X_snowpack, X_sun)
-        # loss
-        loss = loss_function(y_hat, y)
-        # gradients
+        # set gradients to 0
         optimizer.zero_grad()
-        loss.backward()
-        # model weights update
-        optimizer.step()
+        # scaler optimization
+        with torch.autocast(device_type="cuda"):
+            # predict
+            y_hat = model(X)
+            # loss
+            loss = loss_function(y_hat, y)
+        # gradients update
+        scaler.scale(loss).backward()
+        # weights update
+        scaler.step(optimizer)
+        scaler.update()
         # running loss
-        batch_size = X_snowpack.size(0)
+        batch_size = X.size(0)
         running_loss += loss.item() * batch_size
         count += batch_size
         # progress bar update
@@ -74,7 +79,7 @@ def evaluate(
     '''
     Model evaluation
 
-    * Don't forget to move inputs model and metric function to the device
+    * Don't forget to the model and the metric function to the device
     '''
 
     # turn off training mode
@@ -90,16 +95,16 @@ def evaluate(
         # loop on batches
         disable_tqdm = not sys.stdout.isatty()
         progress_bar = tqdm(dataloader, desc=desc, disable=disable_tqdm)
-        for X_snowpack, X_sun, y in progress_bar:
+        for X, y in progress_bar:
             # move tensors to the device
-            X_snowpack, X_sun = X_snowpack.to(device), X_sun.to(device)
+            X = X.to(device)
             y = y.to(device)
             # predict
-            y_hat = model(X_snowpack, X_sun)
+            y_hat = model(X)
             # loss
             loss = loss_function(y_hat, y)
             # running loss
-            batch_size = X_snowpack.size(0)
+            batch_size = X.size(0)
             running_loss += loss.item() * batch_size
             count += batch_size
             # update metric
