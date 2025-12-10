@@ -57,7 +57,7 @@ class CustomNorm2:
         df = pd.read_parquet(stats_parquet_file_path)
 
         self.input_means = np.empty((303,))
-        self.input_means[0:50] = 1.
+        self.input_means[0:50] = 0.
         self.input_means[50:100] = df["dz"]["mean"]
         self.input_means[100:150] = df["ssa"]["mean"]
         self.input_means[150:200] = df["density"]["mean"]
@@ -81,8 +81,19 @@ class CustomNorm2:
         self.target_mean = df["albedo"]["mean"]
         self.target_std = df["albedo"]["std"]
 
+        self.snowpack_means = self.input_means[0:300]
+        self.sun_means = self.input_means[300:303]
+        self.snowpack_stds = self.input_stds[0:300]
+        self.sun_stds = self.input_stds[300:303]
+
     def normalize_inputs(self, x: np.ndarray) -> np.ndarray:
         return (x - self.input_means) / self.input_stds
 
     def normalize_target(self, x: np.ndarray) -> np.ndarray:
         return (x - self.target_mean) / self.target_std
+
+    def normalize_snowpack(self, x: np.ndarray) -> np.ndarray:
+        return (x - self.snowpack_means) / self.snowpack_stds
+
+    def normalize_sun(self, x: np.ndarray) -> np.ndarray:
+        return (x - self.sun_means) / self.sun_stds

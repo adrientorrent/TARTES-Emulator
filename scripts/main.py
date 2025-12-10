@@ -14,9 +14,9 @@ from torchinfo import summary
 from utils.data_selection import train_test_split, print_selection
 from normalization.mean_and_std import trigger_mean_and_std
 from normalization.normalize import CustomNorm2
-from dataset import MlpTartesIterableDataset
-from model import MlpTartesEmulator
-from training import train, evaluate
+from dataset import CnnTartesIterableDataset
+from model import CnnTartesEmulator
+from training import train_cnn, evaluate_cnn
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
@@ -52,15 +52,15 @@ def main():
 
     # Datasets
     logger.debug("Creating datasets")
-    train_dataset = MlpTartesIterableDataset(files=train_files,
+    train_dataset = CnnTartesIterableDataset(files=train_files,
                                              norm=custom_norm)
-    test_dataset = MlpTartesIterableDataset(files=test_files,
+    test_dataset = CnnTartesIterableDataset(files=test_files,
                                             norm=custom_norm)
 
     # Dataloaders
     logger.debug("Creating dataloaders")
 
-    BATCH_SIZE = 512
+    BATCH_SIZE = 256
     NUM_WORKERS = 16
     PREFETCH_FACTOR = 64
     PIN_MEMORY = True
@@ -93,29 +93,36 @@ def main():
 
     # 1st batch shapes
     if logger.getEffectiveLevel() == logging.DEBUG:
-        for X, y in train_dataloader:
-            logger.debug(f"BATCH SHAPES | X: {X.shape}, y: {y.shape}")
+        for X_snow, X_sun, y in train_dataloader:
+            print(f"BATCH SHAPES | X_snow: {X_snow.shape}, "
+                  f"x_sun: {X_sun.shape}, y: {y.shape}")
+            for i in range(1):
+                print(X_snow[i])
+                print(X_sun[i])
+                print(y[i])
             break
+
+    return
 
     # Model
     logger.debug("Build model")
-    mlp_model = MlpTartesEmulator()
+    cnn_model = CnnTartesEmulator()
     summary(
-        mlp_model,
-        input_size=[(1, 303)],
-        col_names=["input_size", "output_size", "num_params"]
+        cnn_model,
+        input_size=[(1, 6, 50), (1, 3)],
+        col_names=["kernel_size", "input_size", "output_size", "num_params"]
     )
 
-    # Loss, metric, optimizer and scheduler
+    # Loss and metric
     logger.debug("Loss and metric")
     mse_loss_fn = MSELoss()
     print("Loss: MSELoss")
     mse_metric_fn = MeanSquaredError()
     print("Metric: MeanSquaredError")
-    adam_optimizer = Adam(mlp_model.parameters(), lr=1e-3, weight_decay=1e-4)
+    adam_optimizer = Adam(cnn_model.parameters(), lr=1e-3, weight_decay=1e-4)
     print("Opimizer: Adam(lr=1e-3, weight_decay=1e-4)")
-    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.98)
-    print("Scheduler: ExponentialLR(gamma=0.98)")
+    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.5)
+    print("Scheduler: ExponentialLR(gamma=0.5)")
     scaler = torch.GradScaler()
     print("Scaler: GradScaler")
     print("=" * 115)
@@ -123,7 +130,7 @@ def main():
     # Device
     # GPUs on sxbigdata1 : 0, 1 are NVIDIA A30 and 2 is a Tesla V100-PCIE-16GB
     DEVICE = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
-    mlp_model = mlp_model.to(DEVICE)
+    cnn_model = cnn_model.to(DEVICE)
     mse_metric_fn = mse_metric_fn.to(DEVICE)
     print(f"The following experiments will be launched on {DEVICE}")
     logger.debug(
@@ -133,16 +140,16 @@ def main():
 
     # Forward pass
     if logger.getEffectiveLevel() == logging.DEBUG:
-        for X, y in train_dataloader:
-            X = X.to(DEVICE)
-            y_hat = mlp_model(X)
-            logger.debug(f"OUTPUT SHAPES | y: {y.shape}, y_hat: {y_hat.shape}")
-            logger.debug(f"FORWARD PASS | "
-                         f"Tartes: {y[0][0]}, Model prediction: {y_hat[0][0]}")
+        for X_snow, X_sun, y in train_dataloader:
+            X_snow, X_sun = X_snow.to(DEVICE), X_sun.to(DEVICE)
+            y_hat = cnn_model(X_snow, X_sun)
+            print(f"OUTPUT SHAPES | y: {y.shape}, y_hat: {y_hat.shape}")
+            print(f"FORWARD PASS | "
+                  f"Tartes: {y[0][0]}, Model prediction: {y_hat[0][0]}")
             break
 
     # Training loop
-    epochs = 3
+    epochs = 5
     logger.debug(f"Training on {epochs} epochs")
     for ep in range(epochs):
 
@@ -151,9 +158,9 @@ def main():
         start_time = time.time()
 
         # Training
-        mlp_model = train(
+        cnn_model = train_cnn(
             train_dataloader=train_dataloader,
-            model=mlp_model,
+            model=cnn_model,
             loss_function=mse_loss_fn,
             optimizer=adam_optimizer,
             scheduler=explr_scheduler,
@@ -162,9 +169,9 @@ def main():
         )
 
         # Evaluation based on testing data
-        test_loss, test_metric = evaluate(
+        test_loss, test_metric = evaluate_cnn(
             dataloader=test_dataloader,
-            model=mlp_model,
+            model=cnn_model,
             loss_function=mse_loss_fn,
             metric_function=mse_metric_fn,
             device=DEVICE,
@@ -181,8 +188,8 @@ def main():
 
     # Save model parameters (save full model ?)
     if logger.getEffectiveLevel() == logging.INFO:
-        PATH = "/home/torrenta/TARTES-Emulator/data/model/mlp-tartes-model.pt"
-        torch.save(mlp_model.state_dict(), PATH)
+        PATH = "/home/torrenta/TARTES-Emulator/data/model/cnn-tartes-model.pt"
+        torch.save(cnn_model.state_dict(), PATH)
         print(f"Model save in {PATH}")
 
     t1 = time.time()

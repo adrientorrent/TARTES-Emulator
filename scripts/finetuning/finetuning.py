@@ -38,14 +38,14 @@ train_dataset = MlpTartesIterableDataset(files=train_files, norm=custom_norm)
 
 class OptunaTartesEmulator(nn.Module):
 
-    def __init__(self, layer_sizes):
+    def __init__(self, layer_sizes, dropout):
         super().__init__()
         fc_layers = []
         prev_size = 300 + 3
         for size in layer_sizes:
             fc_layers.append(nn.Linear(prev_size, size))
             fc_layers.append(nn.ReLU())
-            fc_layers.append(nn.Dropout(0.2))
+            fc_layers.append(nn.Dropout(dropout))
             prev_size = size
         fc_layers.append(nn.Linear(prev_size, 1))
         fc_layers.append(nn.Sigmoid())
@@ -65,35 +65,36 @@ def objective(trial: optuna.trial.Trial):
     train_dataloader = DataLoader(
         dataset=train_dataset,
         batch_size=512,
-        num_workers=16,
+        num_workers=4,
         prefetch_factor=64,
         drop_last=False,
         pin_memory=False,
         persistent_workers=False
     )
 
-    n_layers = trial.suggest_int("n_layers", 5, 15)
+    hidden_layers = trial.suggest_int("hidden_layers", 2, 15)
+    hidden_dim = trial.suggest_int("hidden_dim", 100, 1000, log=True)
+    shrinkage = trial.suggest_float("shrinkage", 0.5, 1.0)
     layer_sizes = []
-    for i in range(n_layers):
-        size = trial.suggest_categorical(
-            f"layer_{i+1}_size",
-            [10, 50, 100, 300, 500, 1000]
-        )
-        layer_sizes.append(size)
-    model = OptunaTartesEmulator(layer_sizes=layer_sizes)
+    prev_size = hidden_dim
+    for i in range(hidden_layers):
+        layer_sizes.append(prev_size)
+        prev_size = int(shrinkage * prev_size)
+    dropout = trial.suggest_float("dropout", 0.0, 0.5)
+    model = OptunaTartesEmulator(layer_sizes=layer_sizes, dropout=dropout)
 
     mse_loss_fn = MSELoss()
     mse_metric_fn = MeanSquaredError()
-    lr = trial.suggest_float("learning_rate", 1e-5, 1e-3, log=True)
+    lr = trial.suggest_float("learning_rate", 1e-5, 1e-2, log=True)
     adam_optimizer = Adam(model.parameters(), lr=lr, weight_decay=1e-4)
-    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.98)
+    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=1.)
     scaler = torch.GradScaler()
 
     device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     model.to(device)
     mse_metric_fn = mse_metric_fn.to(device)
 
-    epochs = 3
+    epochs = 5
     for _ in range(epochs):
         model = train(
             train_dataloader=train_dataloader,
@@ -120,7 +121,7 @@ if __name__ == "__main__":
 
     t0 = time.time()
 
-    study_path = "/home/torrenta/TARTES-Emulator/scripts/finetuning/study.db"
+    study_path = "/home/torrenta/TARTES-Emulator/scripts/finetuning/study1.db"
     study = optuna.create_study(
         direction="minimize",
         study_name="TARTES",

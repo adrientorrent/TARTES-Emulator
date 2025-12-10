@@ -6,10 +6,9 @@ import torch
 from torch.utils.data import IterableDataset, get_worker_info
 
 import numpy as np
-import polars as pl
 import pyarrow.parquet as pq
 
-from normalization.normalize import CustomNorm1, CustomNorm2
+from normalization.normalize import CustomNorm2
 
 
 class CnnTartesIterableDataset(IterableDataset):
@@ -17,37 +16,32 @@ class CnnTartesIterableDataset(IterableDataset):
 
     sampletype = tuple[torch.Tensor, torch.Tensor, torch.Tensor]
 
-    def __init__(self, files_paths: list[str]):
+    def __init__(self, files: list[str], norm: CustomNorm2) -> None:
         """
-        :files_paths: list of parquet files paths
+        :files: list of parquet files paths
+        :norm: custom normalization object
         """
+
         super().__init__()
-        self.files_paths = files_paths
-        self.norm = CustomNorm1()
 
-    def normalize(self, x: np.ndarray) -> np.ndarray:
-        """
-        --- currently ---
-        x = [dz1, ..., conc_dust50, direct_sw, diffuse_sw, cos_sza, albedo]
-        """
-        x[:, 0:50] = self.norm.normalize_dz(x[:, 0:50])
-        x[:, 50:100] = self.norm.normalize_ssa(x[:, 50:100])
-        x[:, 100:150] = self.norm.normalize_density(x[:, 100:150])
-        x[:, 150:200] = self.norm.normalize_conc_soot(x[:, 150:200])
-        x[:, 200:250] = self.norm.normalize_conc_dust(x[:, 200:250])
-        x[:, 250] = self.norm.normalize_direct_sw(x[:, 250])
-        x[:, 251] = self.norm.normalize_diffuse_sw(x[:, 251])
-        return x
+        self.files = files
+        self.norm = norm
 
-    @staticmethod
-    def add_snow_layers(x: np.ndarray) -> np.ndarray:
-        """Add a boolean value indicating the presence of snow to each layer"""
-        return np.hstack((~np.isnan(x[:, 0:50]), x))
+        self.meta_cols = ["time", "ZS", "aspect", "slope", "massif_number"]
+        self.snowpack_cols = [
+             f"{k}{i + 1}"
+             for k in ["snow_layer", "dz", "ssa", "density",
+                       "conc_soot", "conc_dust"]
+             for i in range(50)
+        ]
+        self.sun_cols = ["direct_sw", "diffuse_sw", "cos_sza"]
+        self.target_cols = ["albedo"]
 
-    @staticmethod
-    def fill_nan(x: np.ndarray) -> np.ndarray:
-        """Fill nan values with -1"""
-        return np.nan_to_num(x, nan=-1)
+        self.all_files_row_groups: list[tuple[str, int]] = []
+        for fp in files:
+            pf = pq.ParquetFile(fp)
+            for rg in range(pf.num_row_groups):
+                self.all_files_row_groups.append((fp, rg))
 
     @staticmethod
     def build_snowpack_tensor(row: np.ndarray) -> torch.Tensor:
@@ -64,47 +58,62 @@ class CnnTartesIterableDataset(IterableDataset):
         """Albedo numpy array to torch tensor"""
         return torch.from_numpy(row[303:304])
 
-    def loader(self, file_path: str) -> np.ndarray:
+    def loader(self, file_path: str, row_group: int) -> sampletype:
         """Files loader method"""
 
-        # read dataframe
-        df = pl.read_parquet(file_path)
-        # convert to numpy array
-        arr = df[:, 5:].to_numpy().astype(np.float64)
-        # normalize
-        arr = self.normalize(arr)
-        # add snow layers
-        arr = self.add_snow_layers(arr)
-        # fill nan values
-        arr = self.fill_nan(arr)
-        # GPUs accept only 32 bit
-        arr = arr.astype(np.float32)
+        pf = pq.ParquetFile(file_path)
 
-        return arr
+        snowpack_table = pf.read_row_group(row_group,
+                                           columns=self.snowpack_cols)
+        sun_table = pf.read_row_group(row_group, columns=self.sun_cols)
+        target_table = pf.read_row_group(row_group, columns=self.target_cols)
+
+        snowpack_arr = snowpack_table.to_pandas().astype(np.float64).values
+        sun_arr = sun_table.to_pandas().astype(np.float64).values
+        target_arr = target_table.to_pandas().astype(np.float64).values
+
+        for i in range(len(snowpack_arr)):
+            nan_mask = np.isnan(snowpack_arr[i])
+            if nan_mask.any():
+                snowpack_arr[i][nan_mask] = self.norm.snowpack_means[nan_mask]
+            snowpack_arr[i] = self.norm.normalize_snowpack(snowpack_arr[i])
+            sun_arr[i] = self.norm.normalize_sun(sun_arr[i])
+            # target_arr[i] = self.norm.normalize_target(target_arr[i])
+
+        snowpack_tensor = torch.from_numpy(snowpack_arr.astype(np.float32))
+        sun_tensor = torch.from_numpy(sun_arr.astype(np.float32))
+        target_tensor = torch.from_numpy(target_arr.astype(np.float32))
+
+        return snowpack_tensor, sun_tensor, target_tensor
 
     def __iter__(self) -> Iterator[sampletype]:
         """Custom __iter__ method"""
 
         worker_info = get_worker_info()
-        worker_files_path: list[str]
+        worker_files_row_groups: list[tuple[str, int]]
 
         if worker_info is None:
-            worker_files_path = self.files_paths
+            worker_files_row_groups = self.all_files_row_groups
         else:
             num_workers = worker_info.num_workers
             worker_id = worker_info.id
-            per_worker = int(np.ceil(len(self.files_paths) / num_workers))
+            per_worker = int(
+                np.ceil(len(self.all_files_row_groups) / num_workers)
+            )
             start = worker_id * per_worker
-            end = min(start + per_worker, len(self.files_paths))
-            worker_files_path = self.files_paths[start:end]
+            end = min(start + per_worker, len(self.all_files_row_groups))
+            worker_files_row_groups = self.all_files_row_groups[start:end]
 
-        for file_path in worker_files_path:
-            arr = self.loader(file_path)
-            for row in arr:
-                snowpack_tensor = self.build_snowpack_tensor(row)
-                sun_tensor = self.build_sun_tensor(row)
-                albedo_tensor = self.build_albedo_tensor(row)
-                yield snowpack_tensor, sun_tensor, albedo_tensor
+        for k in range(len(worker_files_row_groups)):
+            fp, rg = worker_files_row_groups[k]
+            tab_snowpack, tab_sun, tab_target = self.loader(
+                file_path=fp, row_group=rg
+            )
+            for row in range(len(tab_snowpack)):
+                out1 = tab_snowpack[row].reshape((6, 50))
+                out2 = tab_sun[row]
+                out3 = tab_target[row]
+                yield out1, out2, out3
 
 
 class MlpTartesIterableDataset(IterableDataset):
