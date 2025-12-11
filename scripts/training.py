@@ -74,7 +74,6 @@ def train_cnn(
     loss_function: Module,
     optimizer: Optimizer,
     scheduler: LRScheduler,
-    scaler: torch.GradScaler,
     device: torch.device
 ) -> Module:
     '''
@@ -97,17 +96,14 @@ def train_cnn(
         y = y.to(device)
         # set gradients to 0
         optimizer.zero_grad()
-        # scaler optimization
-        with torch.autocast(device_type="cuda"):
-            # predict
-            y_hat = model(X_snow, X_sun)
-            # loss
-            loss = loss_function(y_hat, y)
+        # predict
+        y_hat = model(X_snow, X_sun)
+        # loss
+        loss = loss_function(y_hat, y)
         # gradients update
-        scaler.scale(loss).backward()
+        loss.backward()
         # weights update
-        scaler.step(optimizer)
-        scaler.update()
+        optimizer.step()
         # running loss
         batch_size = X_snow.size(0)
         running_loss += loss.item() * batch_size

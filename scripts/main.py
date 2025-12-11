@@ -3,9 +3,10 @@
 import sys
 import time
 import logging
+import csv
 
 import torch
-from torch.nn import MSELoss
+from torch.nn import L1Loss
 from torch.optim import Adam, lr_scheduler
 from torch.utils.data import DataLoader
 from torchmetrics import MeanSquaredError
@@ -25,7 +26,7 @@ def main():
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
@@ -60,7 +61,7 @@ def main():
     # Dataloaders
     logger.debug("Creating dataloaders")
 
-    BATCH_SIZE = 256
+    BATCH_SIZE = 32
     NUM_WORKERS = 16
     PREFETCH_FACTOR = 64
     PIN_MEMORY = True
@@ -102,8 +103,6 @@ def main():
                 print(y[i])
             break
 
-    return
-
     # Model
     logger.debug("Build model")
     cnn_model = CnnTartesEmulator()
@@ -115,16 +114,16 @@ def main():
 
     # Loss and metric
     logger.debug("Loss and metric")
-    mse_loss_fn = MSELoss()
-    print("Loss: MSELoss")
+    mae_loss_fn = L1Loss()
+    print("Loss: L1Loss")
     mse_metric_fn = MeanSquaredError()
     print("Metric: MeanSquaredError")
     adam_optimizer = Adam(cnn_model.parameters(), lr=1e-3, weight_decay=1e-4)
     print("Opimizer: Adam(lr=1e-3, weight_decay=1e-4)")
-    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.5)
-    print("Scheduler: ExponentialLR(gamma=0.5)")
-    scaler = torch.GradScaler()
-    print("Scaler: GradScaler")
+    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.98)
+    print("Scheduler: ExponentialLR(gamma=0.98)")
+    # scaler = torch.GradScaler()
+    # print("Scaler: GradScaler")
     print("=" * 115)
 
     # Device
@@ -148,8 +147,13 @@ def main():
                   f"Tartes: {y[0][0]}, Model prediction: {y_hat[0][0]}")
             break
 
+    # Head of csv file
+    with open("results.csv", "w", newline="") as csvfile:
+        writer = csv.writer(csvfile, delimiter=",")
+        writer.writerow(["epoch", "loss", "metric"])
+
     # Training loop
-    epochs = 5
+    epochs = 3
     logger.debug(f"Training on {epochs} epochs")
     for ep in range(epochs):
 
@@ -161,10 +165,9 @@ def main():
         cnn_model = train_cnn(
             train_dataloader=train_dataloader,
             model=cnn_model,
-            loss_function=mse_loss_fn,
+            loss_function=mae_loss_fn,
             optimizer=adam_optimizer,
             scheduler=explr_scheduler,
-            scaler=scaler,
             device=DEVICE
         )
 
@@ -172,7 +175,7 @@ def main():
         test_loss, test_metric = evaluate_cnn(
             dataloader=test_dataloader,
             model=cnn_model,
-            loss_function=mse_loss_fn,
+            loss_function=mae_loss_fn,
             metric_function=mse_metric_fn,
             device=DEVICE,
             desc="Evaluation"
@@ -183,6 +186,9 @@ def main():
         print(f"Elapsed Time : {elapsed_time:.2f} s")
         print(f"Loss: {test_loss}")
         print(f"Metric: {test_metric}")
+        with open("results.csv", "w", newline="") as csvfile:
+            writer = csv.writer(csvfile, delimiter=",")
+            writer.writerow([ep + 1, test_loss, test_metric])
 
         print("-" * 115)
 

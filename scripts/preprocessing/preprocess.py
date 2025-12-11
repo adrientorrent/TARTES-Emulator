@@ -177,7 +177,7 @@ def preprocess_function(forcing_path: str, pro_path: str,
 
     # write parquet
     logger.debug("Writing parquet")
-    df.to_parquet(out_path, engine="pyarrow", row_group_size=50000)
+    df.to_parquet(out_path, engine="pyarrow")
 
     # clean memory
     del FORCING

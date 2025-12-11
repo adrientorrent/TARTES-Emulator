@@ -37,36 +37,20 @@ class CnnTartesEmulator(nn.Module):
         self.gmpool = nn.AdaptiveMaxPool1d(1)
         self.flatten = nn.Flatten()
 
-        self.snowpack_fc = nn.Sequential(
-            nn.Linear(128, 128),
-            nn.ELU(),
-            nn.Linear(128, 64),
-            nn.ELU(),
-            nn.Linear(64, 32),
-            nn.ELU()
-        )
-
-        # --- SUN DENSE LAYERS ---
-
-        self.sun_fc = nn.Sequential(
-            nn.Linear(3, 16),
-            nn.ELU(),
-            nn.Linear(16, 32),
-            nn.ELU()
-        )
-
         # --- FINAL DENSE LAYERS ---
 
-        self.fc1 = nn.Linear(32 + 32, 256)
-        self.fc2 = nn.Linear(256, 256)
-        self.dropout1 = nn.Dropout(0.3)
-        self.fc3 = nn.Linear(256, 128)
+        self.fc1 = nn.Linear(128 + 3, 512)
+        self.dropout1 = nn.Dropout(0.2)
+        self.fc2 = nn.Linear(512, 512)
         self.dropout2 = nn.Dropout(0.2)
-        self.fc4 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(512, 512)
         self.dropout3 = nn.Dropout(0.2)
-        self.fc5 = nn.Linear(64, 32)
-        self.fc6 = nn.Linear(32, 1)
-        self.elu = nn.ELU()
+        self.fc4 = nn.Linear(512, 256)
+        self.dropout4 = nn.Dropout(0.2)
+        self.fc5 = nn.Linear(256, 128)
+        self.dropout5 = nn.Dropout(0.2)
+        self.fc6 = nn.Linear(128, 1)
+        self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def _forward_snowpack(self, x_snowpack: torch.Tensor) -> torch.Tensor:
@@ -88,15 +72,10 @@ class CnnTartesEmulator(nn.Module):
         x_snowpack = self.gmpool(x_snowpack)
         x_snowpack = self.flatten(x_snowpack)
 
-        x_snowpack = self.snowpack_fc(x_snowpack)
-
         return x_snowpack
 
     def _forward_sun(self, x_sun: torch.Tensor) -> torch.Tensor:
         """Sun forward function"""
-
-        x_sun = self.sun_fc(x_sun)
-
         return x_sun
 
     def forward(self, x_snowpack: torch.Tensor, x_sun: torch.Tensor):
@@ -108,22 +87,24 @@ class CnnTartesEmulator(nn.Module):
         x = torch.cat((x_snowpack, x_sun), dim=1)
 
         x = self.fc1(x)
-        x = self.elu(x)
-
-        x = self.fc2(x)
-        x = self.elu(x)
+        x = self.relu(x)
         x = self.dropout1(x)
 
-        x = self.fc3(x)
-        x = self.elu(x)
+        x = self.fc2(x)
+        x = self.relu(x)
         x = self.dropout2(x)
 
-        x = self.fc4(x)
-        x = self.elu(x)
+        x = self.fc3(x)
+        x = self.relu(x)
         x = self.dropout3(x)
 
+        x = self.fc4(x)
+        x = self.relu(x)
+        x = self.dropout4(x)
+
         x = self.fc5(x)
-        x = self.elu(x)
+        x = self.relu(x)
+        x = self.dropout5(x)
 
         x = self.fc6(x)
         x = self.sigmoid(x)
