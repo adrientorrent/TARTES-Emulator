@@ -94,13 +94,12 @@ def train_cnn(
         # move tensors to the device
         X_snow, X_sun = X_snow.to(device), X_sun.to(device)
         y = y.to(device)
-        # set gradients to 0
-        optimizer.zero_grad()
         # predict
         y_hat = model(X_snow, X_sun)
         # loss
         loss = loss_function(y_hat, y)
         # gradients update
+        optimizer.zero_grad()
         loss.backward()
         # weights update
         optimizer.step()
@@ -109,8 +108,7 @@ def train_cnn(
         running_loss += loss.item() * batch_size
         count += batch_size
         # progress bar update
-        progress_bar.set_postfix({"lr": f"{scheduler.get_last_lr()[0]}",
-                                  "loss": f"{running_loss / count}"})
+        progress_bar.set_postfix({"loss": f"{running_loss / count}"})
 
     # Update Learning rate
     scheduler.step()

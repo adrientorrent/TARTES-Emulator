@@ -55,7 +55,7 @@ for file in fp_year:
 files, _, _ = train_test_split(train={("Alpes", "1979_1980")},
                                test={("Alpes", "1980_1981")}, seed=2025)
 data_dir = "/home/torrenta/TARTES-Emulator/data"
-mean_and_std_path = f"{data_dir}/normalization/mean_and_std_212025.parquet"
+mean_and_std_path = f"{data_dir}/normalization/mean_and_std_212026.parquet"
 custom_norm = CustomNorm2(mean_and_std_path)
 dataset = CnnTartesIterableDataset(files=files, norm=custom_norm)
 dataloader = DataLoader(dataset=dataset, batch_size=512, num_workers=16,

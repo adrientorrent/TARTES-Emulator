@@ -43,21 +43,6 @@ class CnnTartesIterableDataset(IterableDataset):
             for rg in range(pf.num_row_groups):
                 self.all_files_row_groups.append((fp, rg))
 
-    @staticmethod
-    def build_snowpack_tensor(row: np.ndarray) -> torch.Tensor:
-        """snowpack data numpy array to torch tensor"""
-        return torch.from_numpy(np.reshape(row[0:300], (6, 50)))
-
-    @staticmethod
-    def build_sun_tensor(row: np.ndarray) -> torch.Tensor:
-        """sun data numpy array to torch tensor"""
-        return torch.from_numpy(row[300:303])
-
-    @staticmethod
-    def build_albedo_tensor(row: np.ndarray) -> torch.Tensor:
-        """Albedo numpy array to torch tensor"""
-        return torch.from_numpy(row[303:304])
-
     def loader(self, file_path: str, row_group: int) -> sampletype:
         """Files loader method"""
 

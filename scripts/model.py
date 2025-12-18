@@ -10,7 +10,7 @@ class CnnTartesEmulator(nn.Module):
     def __init__(self):
         super().__init__()
 
-        # --- SNOWPACK CONV LAYERS ---
+        # Conv layers
 
         self.conv1 = nn.Conv1d(in_channels=6, out_channels=32,
                                kernel_size=3, padding=1)
@@ -23,33 +23,50 @@ class CnnTartesEmulator(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=32, out_channels=64,
                                kernel_size=3, padding=1)
 
-        self.conv4 = nn.Conv1d(in_channels=64, out_channels=64,
+        self.conv4 = nn.Conv1d(in_channels=64, out_channels=128,
+                               kernel_size=3, padding=1)
+
+        self.conv5 = nn.Conv1d(in_channels=128, out_channels=128,
                                kernel_size=3, padding=1)
 
         self.pool2 = nn.MaxPool1d(kernel_size=5)
 
-        self.conv5 = nn.Conv1d(in_channels=64, out_channels=128,
+        self.conv6 = nn.Conv1d(in_channels=128, out_channels=256,
                                kernel_size=3, padding=1)
 
-        self.conv6 = nn.Conv1d(in_channels=128, out_channels=128,
+        self.conv7 = nn.Conv1d(in_channels=256, out_channels=256,
                                kernel_size=3, padding=1)
 
         self.gmpool = nn.AdaptiveMaxPool1d(1)
         self.flatten = nn.Flatten()
 
-        # --- FINAL DENSE LAYERS ---
+        # Dense layers
 
-        self.fc1 = nn.Linear(128 + 3, 512)
+        self.fc1 = nn.Linear(256 + 3, 512)
         self.dropout1 = nn.Dropout(0.2)
         self.fc2 = nn.Linear(512, 512)
         self.dropout2 = nn.Dropout(0.2)
         self.fc3 = nn.Linear(512, 512)
         self.dropout3 = nn.Dropout(0.2)
-        self.fc4 = nn.Linear(512, 256)
+        self.fc4 = nn.Linear(512, 512)
         self.dropout4 = nn.Dropout(0.2)
-        self.fc5 = nn.Linear(256, 128)
+        self.fc5 = nn.Linear(512, 512)
         self.dropout5 = nn.Dropout(0.2)
-        self.fc6 = nn.Linear(128, 1)
+        self.fc6 = nn.Linear(512, 512)
+        self.dropout6 = nn.Dropout(0.2)
+        self.fc7 = nn.Linear(512, 512)
+        self.dropout7 = nn.Dropout(0.2)
+        self.fc8 = nn.Linear(512, 512)
+        self.dropout8 = nn.Dropout(0.2)
+        self.fc9 = nn.Linear(512, 512)
+        self.dropout9 = nn.Dropout(0.2)
+        self.fc10 = nn.Linear(512, 512)
+        self.dropout10 = nn.Dropout(0.2)
+        self.fc11 = nn.Linear(512, 256)
+        self.dropout11 = nn.Dropout(0.2)
+        self.fc12 = nn.Linear(256, 128)
+        self.dropout12 = nn.Dropout(0.2)
+        self.fc13 = nn.Linear(128, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
@@ -63,26 +80,22 @@ class CnnTartesEmulator(nn.Module):
 
         x_snowpack = self.conv3(x_snowpack)
         x_snowpack = self.conv4(x_snowpack)
+        x_snowpack = self.conv5(x_snowpack)
 
         x_snowpack = self.pool2(x_snowpack)
 
-        x_snowpack = self.conv5(x_snowpack)
         x_snowpack = self.conv6(x_snowpack)
+        x_snowpack = self.conv7(x_snowpack)
 
         x_snowpack = self.gmpool(x_snowpack)
         x_snowpack = self.flatten(x_snowpack)
 
         return x_snowpack
 
-    def _forward_sun(self, x_sun: torch.Tensor) -> torch.Tensor:
-        """Sun forward function"""
-        return x_sun
-
     def forward(self, x_snowpack: torch.Tensor, x_sun: torch.Tensor):
         """Forward function"""
 
         x_snowpack = self._forward_snowpack(x_snowpack)
-        x_sun = self._forward_sun(x_sun)
 
         x = torch.cat((x_snowpack, x_sun), dim=1)
 
@@ -107,6 +120,34 @@ class CnnTartesEmulator(nn.Module):
         x = self.dropout5(x)
 
         x = self.fc6(x)
+        x = self.relu(x)
+        x = self.dropout6(x)
+
+        x = self.fc7(x)
+        x = self.relu(x)
+        x = self.dropout7(x)
+
+        x = self.fc8(x)
+        x = self.relu(x)
+        x = self.dropout8(x)
+
+        x = self.fc9(x)
+        x = self.relu(x)
+        x = self.dropout9(x)
+
+        x = self.fc10(x)
+        x = self.relu(x)
+        x = self.dropout10(x)
+
+        x = self.fc11(x)
+        x = self.relu(x)
+        x = self.dropout11(x)
+
+        x = self.fc12(x)
+        x = self.relu(x)
+        x = self.dropout12(x)
+
+        x = self.fc13(x)
         x = self.sigmoid(x)
 
         return x

@@ -32,7 +32,7 @@ def main():
 
     # Files selection
     logger.debug("Data selection")
-    train_files, test_files, _ = train_test_split(train=2, test=1, seed=2025)
+    train_files, test_files, _ = train_test_split(train=10, test=2, seed=2025)
 
     print("=" * 115)
     print("Train dataset:")
@@ -43,7 +43,7 @@ def main():
     # Normalization
     logger.debug("Computing normalization stats")
     data_dir = "/home/torrenta/TARTES-Emulator/data"
-    mean_and_std_path = f"{data_dir}/normalization/mean_and_std_212025.parquet"
+    mean_and_std_path = f"{data_dir}/normalization/mean_and_std_1022025.parquet"
     trigger_mean_and_std(
         files_paths=train_files,
         out_path=mean_and_std_path,
@@ -61,7 +61,7 @@ def main():
     # Dataloaders
     logger.debug("Creating dataloaders")
 
-    BATCH_SIZE = 32
+    BATCH_SIZE = 256
     NUM_WORKERS = 16
     PREFETCH_FACTOR = 64
     PIN_MEMORY = True
@@ -118,12 +118,14 @@ def main():
     print("Loss: L1Loss")
     mse_metric_fn = MeanSquaredError()
     print("Metric: MeanSquaredError")
-    adam_optimizer = Adam(cnn_model.parameters(), lr=1e-3, weight_decay=1e-4)
-    print("Opimizer: Adam(lr=1e-3, weight_decay=1e-4)")
-    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=0.98)
-    print("Scheduler: ExponentialLR(gamma=0.98)")
-    # scaler = torch.GradScaler()
-    # print("Scaler: GradScaler")
+    learning_rate = 1e-4
+    adam_optimizer = Adam(cnn_model.parameters(), lr=learning_rate)
+    print("Opimizer: Adam")
+    print(f"Learning rate: {learning_rate}")
+    gamma = 0.95
+    explr_scheduler = lr_scheduler.ExponentialLR(adam_optimizer, gamma=gamma)
+    print("Scheduler: ExponentialLR")
+    print(f"Gamma: {gamma}")
     print("=" * 115)
 
     # Device
@@ -153,7 +155,7 @@ def main():
         writer.writerow(["epoch", "loss", "metric"])
 
     # Training loop
-    epochs = 3
+    epochs = 100
     logger.debug(f"Training on {epochs} epochs")
     for ep in range(epochs):
 
@@ -186,7 +188,7 @@ def main():
         print(f"Elapsed Time : {elapsed_time:.2f} s")
         print(f"Loss: {test_loss}")
         print(f"Metric: {test_metric}")
-        with open("results.csv", "w", newline="") as csvfile:
+        with open("results.csv", "a", newline="") as csvfile:
             writer = csv.writer(csvfile, delimiter=",")
             writer.writerow([ep + 1, test_loss, test_metric])
 
@@ -194,7 +196,7 @@ def main():
 
     # Save model parameters (save full model ?)
     if logger.getEffectiveLevel() == logging.INFO:
-        PATH = "/home/torrenta/TARTES-Emulator/data/model/cnn-tartes-model.pt"
+        PATH = "/home/torrenta/TARTES-Emulator/data/model/big-tartes-model.pt"
         torch.save(cnn_model.state_dict(), PATH)
         print(f"Model save in {PATH}")
 
