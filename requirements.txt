@@ -1,0 +1,15 @@
+matplotlib==3.10.6
+numpy==2.3.3
+xarray==2025.10.1
+netcdf4==1.7.2
+pandas==2.3.3
+fastparquet==2024.11.0
+polars==1.35.2
+pyarrow==18.1.0
+pytorch-gpu==2.5.1
+pytorch-cuda==11.8
+torchmetrics==1.8.2
+torchinfo==1.8.0
+torchvision==0.20.1
+lightning==2.5.5
+optuna==4.6.0
